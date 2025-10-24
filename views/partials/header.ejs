@@ -8,74 +8,86 @@
   <title><%= title %></title>
 
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <!-- Set theme before paint (anti-flicker) -->
+  <script>
+    (function () {
+      const t = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (t === 'dark' || (!t && prefersDark)) document.documentElement.classList.add('dark');
+    })();
+  </script>
+
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            mono: ['Ubuntu Mono', 'ui-monospace', 'SFMono-Regular']
+            sans: ['Inter','system-ui','sans-serif'],
+            mono: ['Ubuntu Mono','ui-monospace','SFMono-Regular']
           },
           colors: {
-            brand: {
-              50:'#ecfeff',100:'#cffafe',200:'#a5f3fc',300:'#67e8f9',
-              400:'#22d3ee',500:'#06b6d4',600:'#0891b2',700:'#0e7490',
-              800:'#155e75',900:'#164e63'
-            }
-          },
-          boxShadow: {
-            soft: '0 10px 30px -12px rgba(2,132,199,.25)'
+            brand: { 300:'#67e8f9', 400:'#22d3ee', 500:'#06b6d4', 600:'#0891b2' }
           },
           keyframes: {
-            fadeIn: { '0%':{opacity:0, transform:'translateY(6px)'}, '100%':{opacity:1, transform:'translateY(0)'} },
-            float: { '0%,100%':{transform:'translateY(0)'}, '50%':{transform:'translateY(-4px)'} },
+            fadeIn: { '0%':{opacity:0,transform:'translateY(6px)'}, '100%':{opacity:1,transform:'translateY(0)'} },
             shimmer: { '0%':{backgroundPosition:'-200% 0'}, '100%':{backgroundPosition:'200% 0'} }
           },
           animation: {
-            fadeIn:'fadeIn .5s ease-out both',
-            float:'float 3.2s ease-in-out infinite',
+            fadeIn:'fadeIn .45s ease-out both',
             shimmer:'shimmer 2.2s linear infinite'
           },
-          backgroundImage: {
-            'radial-soft': 'radial-gradient(1200px 600px at 10% -10%, rgba(14,165,233,.15), transparent 60%), radial-gradient(1000px 500px at 90% 10%, rgba(99,102,241,.14), transparent 60%)'
+          backgroundImage:{
+            'radial-soft':'radial-gradient(1100px 600px at 10% -10%, rgba(14,165,233,.10), transparent 60%), radial-gradient(900px 500px at 90% 10%, rgba(99,102,241,.10), transparent 60%)'
           }
         }
       }
     }
   </script>
 
+  <!-- Material Icons (Outlined) + Fonts -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
-    /* Komponen kecil tanpa build step */
-    .btn-gradient{
-      @apply relative inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition
-             focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-400;
-      background-image: linear-gradient(135deg,#22d3ee 0%,#6366f1 50%,#8b5cf6 100%);
-      box-shadow: 0 8px 24px rgba(99,102,241,.28);
+    /* Gradient button (tanpa @apply) */
+    .gbtn{
+      display:inline-flex;align-items:center;gap:.5rem;padding:.55rem 1rem;border-radius:0.75rem;
+      color:#fff;font-weight:800;font-size:.75rem;letter-spacing:.02em;
+      background-image:linear-gradient(135deg,#22d3ee 0%,#6366f1 50%,#8b5cf6 100%);
+      box-shadow:0 12px 28px rgba(99,102,241,.28); transition:transform .15s ease, filter .15s ease;
     }
-    .btn-gradient:hover{ filter: brightness(1.08); transform: translateY(-1px); }
-    .btn-gradient:active{ transform: translateY(0); }
+    .gbtn:hover{filter:brightness(1.08); transform:translateY(-1px)}
+    .gbtn:active{transform:translateY(0)}
 
-    .badge{
-      @apply inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold text-white tracking-wide;
-      background-image: linear-gradient(135deg,#06b6d4,#6366f1);
-    }
-
-    .card{
-      @apply rounded-2xl border border-slate-200/70 bg-white/80 backdrop-blur
-             p-4 md:p-5 shadow-soft transition transform;
-    }
-    .card:hover{ transform: translateY(-2px); }
-
-    .glass{ @apply bg-white/60 backdrop-blur-sm border border-white/40; }
+    /* Expand panel */
+    .slide-down{animation:slideDown .18s ease-out}
+    .slide-up{animation:slideUp .18s ease-out}
+    @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes slideUp{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-8px)}}
   </style>
 </head>
-<body class="min-h-dvh bg-slate-50 bg-radial-soft text-slate-900 antialiased">
-<main class="mx-auto max-w-6xl px-4 md:px-6 py-8 animate-fadeIn">
+
+<body class="min-h-dvh bg-slate-50 bg-radial-soft text-slate-900 antialiased
+             dark:bg-slate-900 dark:text-slate-100">
+  <!-- Theme Toggle -->
+  <button id="themeToggle" class="fixed right-4 top-4 z-50 gbtn" aria-label="Toggle theme">
+    <span class="material-icons-outlined text-[18px]" id="themeIcon">dark_mode</span>
+    <span class="hidden sm:inline">Theme</span>
+  </button>
+  <script>
+    const btnTheme = document.getElementById('themeToggle');
+    const iconTheme = document.getElementById('themeIcon');
+    function syncThemeIcon(){ iconTheme.textContent = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode'; }
+    syncThemeIcon();
+    btnTheme.addEventListener('click', () => {
+      const dark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      syncThemeIcon();
+    });
+  </script>
+
+  <main class="mx-auto max-w-6xl px-4 md:px-6 py-8 animate-fadeIn">
