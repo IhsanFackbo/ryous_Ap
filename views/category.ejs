@@ -210,9 +210,11 @@
 
             <% if (endpoint.body && !endpoint.formData) { %>
               <div class="mb-3">
-                <textarea name="body" rows="8"
-                  class="w-full rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono focus:ring-2 focus:ring-brand-300"
-                  placeholder="Enter JSON body here..."><%= typeof endpoint.body === 'object' ? JSON.stringify(endpoint.body, null, 2) : '' %></textarea>
+                <textarea 
+                  name="body" 
+                  rows="8" 
+                  class="w-full rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-y focus:ring-2 focus:ring-brand-300"
+                  placeholder='Type plain text (e.g. hai) or paste JSON...'><%= typeof endpoint.body === 'object' ? JSON.stringify(endpoint.body, null, 2) : '' %></textarea>
                 <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">Modify the JSON as needed.</div>
               </div>
             <% } %>
@@ -329,7 +331,6 @@
     const form = e.target;
     const r = document.getElementById(`response-${i}`);
     const rc = document.getElementById(`response-content-${i}`);
-    const btn = document.getElementById(`clear-${i}`);
     const curlBox = document.getElementById(`curl-${i}`);
     const curlText = document.getElementById(`curl-content-${i}`);
 
@@ -370,20 +371,43 @@
           }
           cfg.data = nfd; cfg.headers['Content-Type']='multipart/form-data';
           curl += ` \\\n  ${fields.join(' \\\n  ')}`;
-        }else{ // JSON (default)
-          let body = {};
+        }else if(contentType==='application/json'){
+          // NEW: dukung JSON atau text/plain dari textarea
           const txt = form.querySelector('textarea[name="body"]');
           if (txt && txt.value.trim()){
-            body = JSON.parse(txt.value);
+            const raw = txt.value.trim();
+            let asJson = null;
+            try { asJson = JSON.parse(raw); } catch(e){ asJson = null; }
+            if(asJson !== null){
+              cfg.headers['Content-Type'] = 'application/json';
+              cfg.data = asJson;
+              curl += ` \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(asJson)}'`;
+            }else{
+              cfg.headers['Content-Type'] = 'text/plain';
+              cfg.data = raw;
+              curl += ` \\\n  -H "Content-Type: text/plain" \\\n  --data-raw ${JSON.stringify(raw)}`;
+            }
           }else{
+            const jsonBody = {};
             for (let [k,v] of fd.entries()){
-              if(k!=='body' && !k.startsWith('route_') && v) body[k]=v;
+              if (k!=='body' && !k.startsWith('route_') && v) jsonBody[k]=v;
+            }
+            if(Object.keys(jsonBody).length){
+              cfg.headers['Content-Type']='application/json';
+              cfg.data=jsonBody;
+              curl += ` \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(jsonBody)}'`;
             }
           }
-          if(Object.keys(body).length){
+        }else{
+          // fallback lain → kirim sebagai JSON sederhana
+          const jsonBody = {};
+          for (let [k,v] of fd.entries()){
+            if (k!=='body' && !k.startsWith('route_') && v) jsonBody[k]=v;
+          }
+          if(Object.keys(jsonBody).length){
             cfg.headers['Content-Type']='application/json';
-            cfg.data = body;
-            curl += ` \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(body)}'`;
+            cfg.data=jsonBody;
+            curl += ` \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(jsonBody)}'`;
           }
         }
       }
