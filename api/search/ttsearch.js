@@ -1,4 +1,3 @@
-// api/downloader/tiktok-search.js
 const src = require('../../lib/scrape_file/search/ttsearch');
 
 let handler = async (res, req) => {
