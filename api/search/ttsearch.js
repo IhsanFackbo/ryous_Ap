@@ -21,7 +21,7 @@ let handler = async (res, req) => {
 };
 
 handler.alias = 'TikTok Search';
-handler.category = 'Downloader';
+handler.category = 'search';
 handler.params = {
   text: { desc: 'Kata kunci untuk pencarian video TikTok.', example: 'anime edit jedag jedug' }
 };
