@@ -14,6 +14,7 @@ let handler = async (res, req) => {
 
 handler.alias = 'YouTube Downloader';
 handler.category = 'Downloader';
+handler.status = 'error'; 
 handler.params = {
     url: { desc: 'Input url from youtube.', example: 'https://youtube.com/...' },
     format: { desc: 'Input format.', options: ['144', '240', '360', '480', '720', '1080', 'mp3'] }
