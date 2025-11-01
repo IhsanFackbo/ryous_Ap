@@ -1,6 +1,5 @@
-// api/anime/samehadaku-covers.js
-const scrape = require('../../lib/scrape_file');
-const src = scrape('anime/Sameheda'); // <- file di atas
+const src = require('../../lib/scrape_file/anime/Sameheda');
+
 
 let handler = async (res, req) => {
   try {
