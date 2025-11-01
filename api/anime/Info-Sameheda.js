@@ -1,42 +1,24 @@
-// api/anime/samehadaku.js
-// Handler API untuk pencarian anime via Samehadaku scraper
+// api/anime/samehadaku-covers.js
+const scrape = require('../../lib/scrape_file');
+const src = scrape('anime/samehadaku'); // <- file di atas
 
-const scrape = require('../../lib/scrape_file'); // loader universal
-const src = scrape('anime/Sameheda'); // ambil scraper file: lib/scrape_file/anime/Sameheda.js
-
-async function handler(req, res) {
+let handler = async (res, req) => {
   try {
-    // support vercel-style dan express-style
-    const query = req.query || {};
-    const q = (query.text || 'One Piece').trim();
-
-    // panggil scraper
-    const data = await src.search(q);
-
-    // kirim hasil ke client
-    res.setHeader('Content-Type', 'application/json');
-    res.statusCode = 200;
-    res.end(JSON.stringify({
-      success: true,
-      source: 'samehadaku',
-      query: q,
-      result: data
-    }));
-  } catch (e) {
-    res.setHeader('Content-Type', 'application/json');
-    res.statusCode = 500;
-    res.end(JSON.stringify({
-      success: false,
-      error: e.message
-    }));
+    const { text } = req.query || {};
+    if (!text || !text.trim()) {
+      return res.reply({ success: false, error: 'Missing "text" query' }, { code: 400 });
+    }
+    const result = await src.search(text.trim());
+    return res.reply({ success: true, count: result.length, result });
+  } catch (error) {
+    return res.reply({ success: false, error: error.message }, { code: 500 });
   }
-}
+};
 
-// metadata opsional (berguna kalau sistem API kamu auto-register handler)
-handler.alias = 'Samehadaku';
+handler.alias = 'Samehadaku Covers';
 handler.category = 'Anime';
 handler.params = {
-  text: { desc: 'Judul anime untuk dicari', example: 'One Piece' }
+  text: { desc: 'Kata kunci pencarian', example: 'One Piece' }
 };
 
 module.exports = handler;
