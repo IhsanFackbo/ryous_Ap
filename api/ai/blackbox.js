@@ -108,17 +108,13 @@ let handler = async (res, req) => {
         );
       }
 
-      return res.reply(
-        JSON.stringify({
-          success: true,
-          provider: 'blackbox.ai',
-          model: DEFAULT_MODEL,
-          query: q,
-          result: content
-        })
-      );
-    }
-
+      return res.reply({
+  success: true,
+  provider: 'blackbox.ai',
+  model: DEFAULT_MODEL,
+  query: q,
+  result: content
+});
     // Gagal → mapping error
     const status = r.status || 500;
     const body = r.data || null;
