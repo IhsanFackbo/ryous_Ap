@@ -4,7 +4,7 @@
 const axios = require('axios');
 
 // ======= SET DI SINI =======
-const API_KEY  = 'bb_b82cceed68dfa68e59a9470152bdc2eb512787c9f4aed2b85bf85e473bb8464c';  // ← ganti dengan key kamu (sk-...)
+const API_KEY  = 'sk-blackbox-isanap';  // ← ganti dengan key kamu (sk-...)
 const MODEL    = 'gpt-4o';
 const ENDPOINT = 'https://api.blackbox.ai/engines/gpt-4o/chat/completions';
 // ===========================
