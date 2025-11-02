@@ -191,8 +191,7 @@ let handler = async (res, req) => {
 handler.alias = 'Blackbox Chat';
 handler.category = 'AI';
 handler.params = {
-  text: { desc: 'Prompt/pertanyaan untuk AI', example: 'Jelaskan event loop di Node.js' },
-  debug: { desc: '(opsional) 1 untuk menyertakan providerRaw di error', example: '1' }
+  text: { desc: 'Prompt/pertanyaan untuk AI', example: 'Jelaskan event loop di Node.js' }
 };
 
 module.exports = handler;
