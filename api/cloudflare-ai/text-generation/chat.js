@@ -17,7 +17,7 @@ let handler = async (res, req) => {
 };
 
 handler.alias = 'Cloudflare Text Generation (Chat)';
-handler.category = 'Cloudflare AI';
+handler.category = 'AI';
 handler.method = 'POST';
 handler.body = {
     messages: [{ role: 'user', content: 'Hi! How are you?' }],
