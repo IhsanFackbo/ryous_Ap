@@ -2,7 +2,7 @@
 const axios = require('axios');
 
 // === GANTI INI DGN KEY MU ===
-const API_KEY = 'sk-blackbox-isanap';
+const API_KEY = 'sk-4kO-IRFmyyO_-P0uD2Tf4w';
 // ============================
 
 const ENDPOINT = 'https://api.blackbox.ai/chat/completions';
