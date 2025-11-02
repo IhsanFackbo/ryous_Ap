@@ -1,108 +1,116 @@
 // api/ai/blackbox.js
+// Drop-in Blackbox API (API key di dalam file)
+
+// === KONFIGURASI CEPAT ===
+const API_KEY  = 'SK_BLACKBOX_TARUH_DISINI';   // <-- GANTI dengan key milikmu
+const MODEL    = 'gpt-4o';                      // model default (bisa: gpt-4o, gpt-4o-mini, dll)
+const ENDPOINT = 'https://api.blackbox.ai/engines/gpt-4o/chat/completions';
+
 const axios = require('axios');
 
-async function callBlackbox(url, text) {
-  const res = await axios.get(`${url}?q=${encodeURIComponent(text)}`, {
+async function callBlackbox(text) {
+  const body = {
+    model: MODEL,
+    messages: [{ role: 'user', content: text }],
+  };
+
+  const resp = await axios.post(ENDPOINT, body, {
     headers: {
-      'Accept': 'application/json, text/plain, */*',
-      'User-Agent': 'Mozilla/5.0 (Node; Blackbox-Relay)'
+      'Authorization': `Bearer ${API_KEY}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
     },
     timeout: 20000,
-    // biar kita bisa tangani 4xx/5xx sendiri
-    validateStatus: () => true
+    validateStatus: () => true, // kita handle error sendiri
   });
 
-  return {
-    ok: res.status >= 200 && res.status < 300,
-    status: res.status,
-    data: res.data
-  };
+  return resp;
 }
 
 let handler = async (res, req) => {
   try {
-    const { text } = req.query || {};
-    const q = (text || '').trim();
+    const q = (req.query?.text || '').trim();
     if (!q) {
       return res.reply(
-        { success: false, error: 'Parameter `text` wajib diisi, contoh: ?text=apa itu javascript' },
+        { success: false, error: 'Parameter `text` wajib diisi, contoh: ?text=Apa itu Node.js?' },
         { code: 400 }
       );
     }
 
-    // daftar fallback yang akan dicoba berurutan
-    const CANDIDATES = [
-      'https://itzpire.com/ai/blackbox-ai', // versi yang kamu pakai
-      'https://itzpire.com/ai/blackbox',    // fallback kemungkinan
-      'https://itzpire.com/ai/blackboxai'   // fallback kemungkinan lain
-    ];
-
-    let lastErr = null;
-    for (const base of CANDIDATES) {
-      try {
-        const r = await callBlackbox(base, q);
-
-        // sukses
-        if (r.ok && r.data && (r.data.result || r.data.answer || typeof r.data === 'string')) {
-          const result =
-            typeof r.data === 'string'
-              ? r.data
-              : (r.data.result || r.data.answer || '');
-
-          return res.reply({
-            success: true,
-            provider: base,
-            query: q,
-            result
-          });
-        }
-
-        // gagal: simpan error untuk dilaporkan nanti
-        lastErr = {
-          providerTried: base,
-          status: r.status,
-          body: r.data
-        };
-
-        // kalau 404, lanjut ke kandidat berikutnya
-        // kalau 401/403/429/5xx, juga lanjut—biar ada kesempatan kandidat lain
-        continue;
-      } catch (e) {
-        // network/timeout/axios error
-        lastErr = {
-          providerTried: base,
-          status: e.response?.status || 0,
-          body: e.response?.data || e.message
-        };
-        continue;
-      }
+    if (!API_KEY || API_KEY === 'shura-blc') {
+      return res.reply(
+        { success: false, error: 'API key belum diisi. Edit file api/ai/blackbox.js pada konstanta API_KEY.' },
+        { code: 401 }
+      );
     }
 
-    // semua kandidat gagal
+    const r = await callBlackbox(q);
+
+    // sukses
+    if (r.status >= 200 && r.status < 300) {
+      const msg = r.data?.choices?.[0]?.message?.content
+               || r.data?.message
+               || r.data?.result
+               || '';
+      if (!msg) {
+        return res.reply(
+          { success: false, error: 'Respon kosong dari Blackbox.' },
+          { code: 502 }
+        );
+      }
+      return res.reply({
+        success: true,
+        provider: 'blackbox.ai',
+        model: MODEL,
+        query: q,
+        result: msg,
+      });
+    }
+
+    // mapping error ramah
+    const status = r.status;
+    const body   = r.data;
+
+    if (status === 401) {
+      return res.reply(
+        { success: false, error: '401 Unauthorized — API key salah/invalid atau tidak dikirim.' },
+        { code: 401 }
+      );
+    }
+    if (status === 429) {
+      return res.reply(
+        { success: false, error: '429 Rate limit — coba lagi beberapa saat.' },
+        { code: 429 }
+      );
+    }
+    if (status >= 500) {
+      return res.reply(
+        { success: false, error: `Server provider error (${status}).`, detail: body },
+        { code: status }
+      );
+    }
+
+    // error lain
     return res.reply(
-      {
-        success: false,
-        error: 'Semua provider Blackbox gagal atau tidak ditemukan.',
-        detail: lastErr // kasih konteks agar gampang debug di client/log
-      },
-      { code: (lastErr && lastErr.status) || 502 }
+      { success: false, error: `Request gagal (${status}).`, detail: body },
+      { code: status || 500 }
     );
-  } catch (error) {
-    // guard terakhir
+
+  } catch (e) {
+    // network/timeout/axios error
+    const status = e?.response?.status || 500;
+    const detail = e?.response?.data || e.message || String(e);
     return res.reply(
-      { success: false, error: error?.message || String(error) },
-      { code: 500 }
+      { success: false, error: 'Gagal memanggil Blackbox.', detail },
+      { code: status }
     );
   }
 };
 
-handler.alias = 'Blackbox AI';
+handler.alias = 'Blackbox Chat';
 handler.category = 'AI';
 handler.params = {
-  text: {
-    desc: 'Pertanyaan/perintah untuk dijawab AI.',
-    example: 'Apa itu Node.js dan bagaimana cara kerjanya?'
-  }
+  text: { desc: 'Pertanyaan/permintaan ke AI', example: 'Tuliskan contoh kode Express sederhana' }
 };
 
 module.exports = handler;
