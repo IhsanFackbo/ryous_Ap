@@ -3,23 +3,26 @@ const scrape = require('../../lib/scrape_file/search/lirik');
 
 const handler = async (res, req) => {
   try {
-    const { text } = req.query; // konsisten pakai ?text=
-    if (!text || !String(text).trim()) {
-      return res.reply({ success: false, error: 'Parameter "text" wajib.' }, { code: 400 });
+    const q = (req?.query?.text || '').trim();
+
+    if (!q) {
+      return res.reply({ success: false, error: 'Parameter "text" wajib.' }, { code: 200 });
     }
 
-    const data = await scrape(text);
+    const data = await scrape(q);
 
-    // Kalau scraper gagal, balikin status 404/400 sesuai message
     if (!data || data.success === false) {
-      return res.reply({ success: false, error: data?.message || 'Lirik tidak ditemukan.' }, { code: 404 });
+      return res.reply({
+        success: false,
+        query: q,
+        error: data?.message || 'Lirik tidak ditemukan.'
+      }, { code: 200 }); // <— 200 supaya UI kamu tidak men-set "Error: [object Object]"
     }
 
-    // Sukses -> kirim JSON asli (jangan di-concat ke string!)
     return res.reply({
       success: true,
       provider: 'musixmatch',
-      query: text,
+      query: q,
       result: {
         title: data.title,
         artist: data.artist,
@@ -29,17 +32,17 @@ const handler = async (res, req) => {
       }
     });
   } catch (err) {
-    return res.reply(
-      { success: false, error: String(err?.message || err) },
-      { code: 500 }
-    );
+    return res.reply({
+      success: false,
+      error: String(err?.message || err)
+    }, { code: 200 }); // tetap 200
   }
 };
 
 handler.alias = 'Lyrics Search';
-handler.category = 'Search';        // <— samakan case, jangan 'search'
+handler.category = 'Search';
 handler.params = {
-  text: { desc: 'Judul lagu/artist untuk dicari liriknya', example: 'hati hati di jalan tulus' }
+  text: { desc: 'Judul lagu / artist', example: 'I wanna be yours' }
 };
 
 module.exports = handler;
