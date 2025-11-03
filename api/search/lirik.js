@@ -1,33 +1,50 @@
-// api/music/lirik.js
-const src = require('../../lib/scrape_file/search/lirik');
+// api/search/lirik.js
+const scrape = require('../../lib/scrape');
+const src = scrape('search/lirik'); // arahkan ke file: lib/scrape_file/search/lirik.js
+
 let handler = async (res, req) => {
   try {
-    const { query } = req;
-    const q = query.text || '';
-    if (!q) return res.reply({ success: false, error: 'Masukkan judul lagu!' }, { code: 400 });
+    const q = (req?.query?.text || '').trim();
+
+    if (!q) {
+      return res.reply(
+        { success: false, error: 'Masukkan judul lagu pada parameter ?text=' },
+        { code: 400 }
+      );
+    }
 
     const data = await src(q);
-    if (!data.success)
-      return res.reply({ success: false, error: data.message }, { code: 404 });
 
-    res.reply({
+    // Tangani hasil yang tidak valid / kosong
+    if (!data || data.success === false) {
+      return res.reply(
+        { success: false, error: String(data?.message || 'Lirik tidak ditemukan.') },
+        { code: 404 }
+      );
+    }
+
+    // Pastikan setiap field dikonversi menjadi string (anti [object Object])
+    return res.reply({
       success: true,
       result: {
-        title: data.title,
-        thumbnail: data.thumbnail,
-        link: data.link,
-        lyrics: data.lyrics,
-      },
+        title: String(data.title || ''),
+        artist: String(data.artist || ''),
+        thumbnail: String(data.thumbnail || ''),
+        link: String(data.link || ''),
+        lyrics: String(data.lyrics || '')
+      }
     });
-  } catch (error) {
-    res.reply({ success: false, error: error.message }, { code: 500 });
+  } catch (err) {
+    const msg = err?.message ? String(err.message) : String(err);
+    return res.reply({ success: false, error: msg }, { code: 500 });
   }
 };
 
+// Metadata
 handler.alias = 'Musixmatch Lirik';
-handler.category = 'search';
+handler.category = 'Search'; // ✅ kategori sudah diset sesuai permintaan
 handler.params = {
-  text: { desc: 'Judul lagu untuk dicari liriknya', example: 'Perfect - Ed Sheeran' },
+  text: { desc: 'Judul lagu untuk dicari liriknya', example: 'Perfect - Ed Sheeran' }
 };
 
 module.exports = handler;
