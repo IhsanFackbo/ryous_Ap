@@ -1,5 +1,5 @@
 const axios = require('axios');
-const remini = require('../../lib/scrape_file/image/remini');
+const remini = require('../../lib/scrape_file/Photo/Remini');
 
 function sendJson(res, obj, code=200) {
   try { res.statusCode = code; } catch {}
