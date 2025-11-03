@@ -1,7 +1,5 @@
 // api/music/lirik.js
-const scrape = require('../../lib/scrape');
-const src = scrape('music/lirik');
-
+const src = require('../../lib/scrape_file/search/lirik');
 let handler = async (res, req) => {
   try {
     const { query } = req;
