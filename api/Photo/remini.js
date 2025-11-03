@@ -1,67 +1,75 @@
-// api/image/remini.js
 const axios = require('axios');
-const remini = require('../../lib/scrape_file/Photo/Remini');
+const remini = require('../../lib/scrape_file/image/remini');
+
+function sendJson(res, obj, code=200) {
+  try { res.statusCode = code; } catch {}
+  try { res.setHeader('Content-Type','application/json'); } catch {}
+  res.end(JSON.stringify(obj));
+}
 
 async function readBodyAsBuffer(req) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    req.on('data', (c) => chunks.push(c));
-    req.on('end', () => resolve(Buffer.concat(chunks)));
-    req.on('error', reject);
+  return new Promise((resolve,reject)=>{
+    const chunks=[]; req.on('data',c=>chunks.push(c));
+    req.on('end',()=>resolve(Buffer.concat(chunks)));
+    req.on('error',reject);
   });
 }
 
 let handler = async (res, req) => {
+  const q = req.query || {};
+  const mode = String(q.mode || 'enhance').toLowerCase();
+  const imgUrl = q.url;
+
   try {
-    const q = req.query || {};
-    const mode = String(q.mode || 'enhance').toLowerCase();
-
+    // Ambil input gambar
     let inputBuf = null;
-
-    if (q.url) {
-      const { data } = await axios.get(q.url, {
+    if (imgUrl) {
+      const { data } = await axios.get(imgUrl, {
         responseType: 'arraybuffer',
         timeout: 20000,
         headers: { 'User-Agent': 'Mozilla/5.0' }
       });
       inputBuf = Buffer.from(data);
-    } else if (/^image\//i.test(String(req.headers['content-type'] || ''))) {
+    } else if (/^image\//i.test(String(req.headers['content-type']||''))) {
       inputBuf = await readBodyAsBuffer(req);
     }
 
     if (!inputBuf) {
-      return res.reply(
-        {
-          success: false,
-          error: 'Kirim ?url=<gambar> atau POST body biner image dengan Content-Type: image/*',
-          usage: {
-            GET: '/image/remini?mode=enhance&url=https://host/foto.jpg',
-            POST: 'curl -X POST -H "Content-Type: image/jpeg" --data-binary @in.jpg /image/remini?mode=dehaze'
-          }
-        },
-        { code: 400 }
-      );
+      return sendJson(res, {
+        success:false,
+        error:'Invalid parameters. Kirim ?url=<gambar> atau POST body image/*',
+        usage:{
+          GET:'/photo/remini?mode=enhance&url=https://host/img.jpg',
+          POST:'curl -X POST -H "Content-Type: image/jpeg" --data-binary @in.jpg https://host/photo/remini?mode=dehaze'
+        }
+      }, 400);
     }
 
     const out = await remini(inputBuf, mode);
 
-    // kirim langsung sebagai file
-    res.setHeader('Content-Type', 'image/jpeg');
-    res.setHeader('Content-Disposition', `inline; filename="remini_${mode}.jpg"`);
+    // Sukses → kirim buffer image
+    try { res.setHeader('Content-Type','image/jpeg'); } catch {}
+    try { res.setHeader('Content-Disposition', `inline; filename="remini_${mode}.jpg"`); } catch {}
     return res.end(out);
+
   } catch (e) {
-    return res.reply(
-      { success: false, error: e?.message || String(e) },
-      { code: 500 }
-    );
+    // Jangan “[object Object]” lagi — selalu JSON jelas
+    console.error('REMINI ERROR:', e);
+    return sendJson(res, {
+      success:false,
+      provider:'vyro',
+      mode,
+      url: imgUrl || '(body)',
+      error: e.message || String(e)
+    }, 500);
   }
 };
 
 handler.alias = 'Remini (Vyro)';
-handler.category = 'Image';
+handler.category = 'Photo';
 handler.params = {
-  mode: { desc: 'enhance|recolor|dehaze', example: 'enhance' },
-  url:  { desc: 'URL gambar (opsional jika POST body biner)', example: 'https://...' }
+  mode:{desc:'enhance|recolor|dehaze', example:'enhance'},
+  url:{desc:'URL gambar (opsional jika POST body biner)', example:'https://.../image.jpg'}
 };
 
 module.exports = handler;
