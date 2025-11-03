@@ -25,7 +25,7 @@ let handler = async (res, req) => {
 };
 
 handler.alias = 'Musixmatch Lirik';
-handler.category = 'Music';
+handler.category = 'search';
 handler.params = {
   text: { desc: 'Judul lagu untuk dicari liriknya', example: 'Perfect - Ed Sheeran' },
 };
