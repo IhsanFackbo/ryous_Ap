@@ -38,6 +38,7 @@ let handler = async (res, req) => {
 
 handler.alias = 'Lyrics Finder';
 handler.category = 'Search';
+handler.status = erorr;
 handler.params = {
   text: { desc: 'Judul/artist atau potongan lirik', example: 'I wanna be yours' }
 };
