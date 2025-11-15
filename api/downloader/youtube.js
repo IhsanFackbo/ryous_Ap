@@ -1,9 +1,5 @@
 const src = require('../../lib/scrape_file/downloader/savetube');
 
-// api/downloader/youtube.js
-
-const src = require('../../lib/scrape_file/downloader/youtube');
-
 let handler = async (res, req) => {
   try {
     const { url, format = '360' } = req.query || {};
