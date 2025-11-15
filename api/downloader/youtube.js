@@ -1,17 +1,21 @@
 const src = require('../../lib/scrape_file/downloader/savetube');
 
-let handler = async (req, res) => {
+let handler = async (res, req) => {
   try {
-    const { url, format = '360p' } = req.query;
+    const { url, format = '360' } = req.query || {};
 
-    if (!url || !/(youtube\.com|youtu\.be)/.test(url)) {
+    if (!url || !/(youtube\.com|youtu\.be)/i.test(url)) {
       return res.reply('Invalid url.', { code: 400 });
     }
 
-    const result = await src(url, format); // pakai scrape di atas
+    const result = await src(url, format);
+
+    // result sudah berisi:
+    // { success, id, title, duration, thumbnail, type, requestedFormat, quality, mime, downloadUrl }
     return res.reply(result);
   } catch (error) {
-    return res.reply(error.message, { code: 500 });
+    console.error('YT API error:', error);
+    return res.reply(error.message || 'Internal error', { code: 500 });
   }
 };
 
@@ -20,12 +24,12 @@ handler.category = 'Downloader';
 handler.status = 'active';
 handler.params = {
   url: {
-    desc: 'Input url dari YouTube.',
-    example: 'https://www.youtube.com/watch?v=Ip6cw8gfHHI'
+    desc: 'Input url from youtube.',
+    example: 'https://youtu.be/Ip6cw8gfHHI'
   },
   format: {
-    desc: 'Format download.',
-    options: ['128k', '320k', '144p', '240p', '360p', '720p', '1080p']
+    desc: 'Input format.',
+    options: ['144', '240', '360', '480', '720', '1080', 'mp3']
   }
 };
 
