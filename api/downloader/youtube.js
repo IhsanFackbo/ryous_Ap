@@ -1,5 +1,9 @@
 const src = require('../../lib/scrape_file/downloader/savetube');
 
+// api/downloader/youtube.js
+
+const src = require('../../lib/scrape_file/downloader/youtube');
+
 let handler = async (res, req) => {
   try {
     const { url, format = '360' } = req.query || {};
@@ -9,12 +13,11 @@ let handler = async (res, req) => {
     }
 
     const result = await src(url, format);
-
-    // result sudah berisi:
-    // { success, id, title, duration, thumbnail, type, requestedFormat, quality, mime, downloadUrl }
+    // result sudah berisi downloadUrl + info lainnya
     return res.reply(result);
+
   } catch (error) {
-    console.error('YT API error:', error);
+    console.error('YT API ERROR:', error);
     return res.reply(error.message || 'Internal error', { code: 500 });
   }
 };
