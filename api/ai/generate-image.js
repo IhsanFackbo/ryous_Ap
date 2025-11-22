@@ -1,5 +1,5 @@
 // api/fastflux-generate.js
-const src = scrape('ai/fastflux'); // sesuaikan path sesuai sistem scrape kamu
+const { generateImage } = scrape('ai/fastflux');
 
 let handler = async (res, req) => {
   try {
@@ -12,12 +12,14 @@ let handler = async (res, req) => {
       );
     }
 
-    const data = await src.generate(text);
+    const data = await generateImage(text);
 
-    return res.reply({
-      success: true,
-      ...data
-    });
+    return res.reply(
+      {
+        success: true,
+        ...data
+      }
+    );
   } catch (error) {
     console.error('FastFlux Generate Error:', error);
 
@@ -41,7 +43,7 @@ handler.category = 'AI';
 handler.params = {
   text: {
     desc: 'Prompt teks untuk generate image',
-    example: 'cute cat astronaut in space, 4k'
+    example: 'kucing imut pakai hoodie, 4k'
   }
 };
 
