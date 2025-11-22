@@ -1,106 +1,63 @@
-// ai/upscaler.js
-const axios = require('axios');
-const FormData = require('form-data');
+// api/upscaler.js
+const src = scrape('ai/upscaler'); // pastikan path sesuai sistem kamu
 
-async function postCode(buffer, scaleRadio = 2) {
-  const form = new FormData();
-  form.append('myfile', buffer, {
-    filename: `image-${Date.now()}.png`,
-    contentType: 'image/png' // biarin generic
-  });
-  form.append('scaleRadio', scaleRadio);
+let handler = async (res, req) => {
+  try {
+    const { imageUrl, scale } = req.query;
 
-  const headers = {
-    ...form.getHeaders(),
-    'User-Agent':
-      'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36',
-    Accept: 'application/json, text/plain, */*',
-    Origin: 'https://imgupscaler.com'
-  };
+    if (!imageUrl) {
+      return res.reply(
+        {
+          success: false,
+          error: 'Parameter imageUrl wajib diisi.'
+        },
+        { code: 400 }
+      );
+    }
 
-  const { data } = await axios.post(
-    'https://get1.imglarger.com/api/UpscalerNew/UploadNew',
-    form,
-    { headers }
-  );
+    // ambil buffer gambar dari URL (sesuai pola sistem-mu)
+    // asumsi: res.getBuffer(url, { mime: 'image' }) sudah tersedia
+    const buffer = await res.getBuffer(imageUrl, { mime: 'image' });
 
-  if (!data?.data?.code) {
-    throw new Error(
-      'Gagal mendapatkan code dari Upscaler: ' +
-        (data?.message || JSON.stringify(data))
+    // scale optional: ?scale=4; default 2
+    const scaleRadio = scale ? Number(scale) || 2 : 2;
+
+    const data = await src(buffer, { scaleRadio });
+
+    return res.reply({
+      success: data.success,
+      status: data.status,
+      result: data.result
+    });
+  } catch (error) {
+    console.error('Upscaler API Error:', error);
+
+    const msg =
+      typeof error === 'string'
+        ? error
+        : error?.message || JSON.stringify(error);
+
+    return res.reply(
+      {
+        success: false,
+        error: msg
+      },
+      { code: 500 }
     );
   }
-
-  return data.data.code;
-}
-
-async function checkStatus(code, scaleRadio = 2) {
-  const params = { code, scaleRadio };
-  const headers = {
-    'User-Agent':
-      'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36',
-    'Content-Type': 'application/json',
-    Accept: 'application/json, text/plain, */*',
-    Referer: 'https://imgupscaler.com/'
-  };
-
-  const { data } = await axios.post(
-    'https://get1.imglarger.com/api/UpscalerNew/CheckStatusNew',
-    params,
-    { headers }
-  );
-
-  return data?.data || null;
-}
-
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/**
- * Upscale gambar dari buffer
- * @param {Buffer} buffer - buffer image
- * @param {Object} options
- * @param {number} [options.scaleRadio=2] - faktor scale (2, 4, dll, sesuai support API)
- * @param {number} [options.maxTry=10] - berapa kali polling
- * @param {number} [options.intervalMs=3000] - jeda antar polling (ms)
- */
-async function Upscaler(buffer, options = {}) {
-  const {
-    scaleRadio = 2,
-    maxTry = 10,
-    intervalMs = 3000
-  } = options;
-
-  const code = await postCode(buffer, scaleRadio);
-
-  let result = null;
-  for (let i = 0; i < maxTry; i++) {
-    result = await checkStatus(code, scaleRadio);
-    if (result?.status === 'success') break;
-    await delay(intervalMs);
-  }
-
-  if (!result) {
-    throw new Error('Tidak mendapatkan respon status dari Upscaler.');
-  }
-
-  return {
-    status: result.status || 'unknown',
-    success: result.status === 'success',
-    result: {
-      downloadUrl: result.downloadUrls?.[0] || null,
-      fileSize: result.filesize || null,
-      mimeType: result.imagemimetype || null,
-      filename: result.originalfilename || null
-    }
-  };
-}
-
-// default export: dipanggil via scrape('ai/upscaler')
-module.exports = async (buffer, options = {}) => {
-  if (!buffer || !Buffer.isBuffer(buffer)) {
-    throw new Error('Buffer gambar tidak valid.');
-  }
-  return Upscaler(buffer, options);
 };
+
+handler.alias = 'Image Upscaler';
+handler.category = 'AI';
+handler.params = {
+  imageUrl: {
+    desc: 'URL gambar yang akan di-upscale (disarankan pakai tmpfiles atau direct image URL)',
+    example: 'https://tmpfiles.org/dl/xxxx/image.png'
+  },
+  scale: {
+    desc: 'Faktor perbesaran (opsional, default 2)',
+    example: '2'
+  }
+};
+
+module.exports = handler;
