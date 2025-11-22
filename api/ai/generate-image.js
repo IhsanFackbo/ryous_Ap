@@ -1,5 +1,4 @@
-// api/fastflux-generate.js
-const { generateImage } = scrape('ai/fastflux');
+const { getFastFluxImageBuffer } = scrape('ai/fastflux');
 
 let handler = async (res, req) => {
   try {
@@ -12,38 +11,32 @@ let handler = async (res, req) => {
       );
     }
 
-    const data = await generateImage(text);
+    const { buffer, mime } = await getFastFluxImageBuffer(text);
 
-    return res.reply(
-      {
-        success: true,
-        ...data
-      }
-    );
+    // kirim sebagai file image langsung
+    res.setHeader('Content-Type', mime);
+    res.setHeader('Content-Length', buffer.length);
+    res.end(buffer);
+
   } catch (error) {
-    console.error('FastFlux Generate Error:', error);
+    console.error('FastFlux Buffer Error:', error);
 
     const msg =
       typeof error === 'string'
         ? error
         : error?.message || JSON.stringify(error);
 
-    return res.reply(
-      {
-        success: false,
-        error: msg
-      },
-      { code: 500 }
-    );
+    // fallback error JSON
+    res.reply({ success: false, error: msg }, { code: 500 });
   }
 };
 
-handler.alias = 'FastFlux Image Generator';
+handler.alias = 'FastFlux Buffer Image';
 handler.category = 'AI';
 handler.params = {
   text: {
-    desc: 'Prompt teks untuk generate image',
-    example: 'kucing imut pakai hoodie, 4k'
+    desc: 'Text prompt untuk generate image',
+    example: 'kucing lucu pakai hoodie'
   }
 };
 
