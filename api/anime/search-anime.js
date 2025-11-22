@@ -18,8 +18,14 @@ let handler = async (res, req) => {
       ...data
     });
   } catch (error) {
+    console.error('Kurama Search Error:', error);
+
+    const msg = typeof error === 'string'
+      ? error
+      : error?.message || JSON.stringify(error);
+
     return res.reply(
-      { success: false, error: error.message || 'Internal Server Error' },
+      { success: false, error: msg },
       { code: 500 }
     );
   }
@@ -30,7 +36,7 @@ handler.category = 'Anime';
 handler.params = {
   q: { desc: 'Kata kunci pencarian', example: 'one piece' },
   page: { desc: 'Halaman', example: '1' },
-  order_by: { desc: 'Urutkan (latest, popular, dll jika ada)', example: 'latest' }
+  order_by: { desc: 'Urutkan (latest, dsb)', example: 'latest' }
 };
 
 module.exports = handler;
