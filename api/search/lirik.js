@@ -1,5 +1,5 @@
 // api/lyrics.js
-const src = scrape('search/lirik');
+const src = scrape('ai/lyrics');
 
 let handler = async (res, req) => {
   try {
@@ -9,7 +9,7 @@ let handler = async (res, req) => {
       return res.reply(
         {
           success: false,
-          error: 'Parameter q wajib diisi (judul lagu / query).'
+          error: 'Parameter q wajib diisi (judul lagu).'
         },
         { code: 400 }
       );
@@ -17,26 +17,25 @@ let handler = async (res, req) => {
 
     const data = await src(q);
 
-    return res.reply({
-      success: true,
-      query: q,
-      title: data.title,
-      thumbnail: data.thumbnail,
-      url: data.url,
-      lyrics: data.lyrics // bisa null kalau cuma dapet snippet / link
-    });
-  } catch (error) {
-    console.error('Lyrics API Error:', error);
-
-    const msg =
-      typeof error === 'string'
-        ? error
-        : error?.message || JSON.stringify(error);
+    return res.reply(
+      {
+        success: data.success !== false,
+        query: q,
+        title: data.title || null,
+        thumbnail: data.thumbnail || null,
+        url: data.url || null,
+        lyrics: data.lyrics || null,
+        error: data.error || null
+      },
+      { code: 200 }
+    );
+  } catch (e) {
+    console.error('Lyrics API Error:', e);
 
     return res.reply(
       {
         success: false,
-        error: msg
+        error: e?.message || String(e)
       },
       { code: 500 }
     );
@@ -44,11 +43,11 @@ let handler = async (res, req) => {
 };
 
 handler.alias = 'Lyrics Search';
-handler.category = 'Search';
+handler.category = 'Music';
 handler.params = {
   q: {
-    desc: 'Judul lagu / query untuk dicari di Genius',
-    example: 'The Weeknd Blinding Lights'
+    desc: 'Judul lagu yang ingin dicari',
+    example: 'Olivia Rodrigo – Drivers License'
   }
 };
 
