@@ -1,5 +1,5 @@
 // api/lyrics.js
-const src = scrape('ai/lyrics');
+const src = scrape('search/lirik');
 
 let handler = async (res, req) => {
   try {
