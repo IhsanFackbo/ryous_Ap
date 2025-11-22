@@ -1,46 +1,55 @@
-const scrape = require('../../lib/scrape_file/search/lirik');
+// api/lyrics.js
+const src = scrape('ai/lyrics');
 
 let handler = async (res, req) => {
   try {
-    const q = (req?.query?.text || '').trim();
+    const { q } = req.query;
+
     if (!q) {
-      return res.reply({ success: false, error: 'Parameter "text" wajib diisi.' }, { code: 200 });
+      return res.reply(
+        {
+          success: false,
+          error: 'Parameter q wajib diisi (judul lagu / query).'
+        },
+        { code: 400 }
+      );
     }
 
-    const data = await scrape(q);
-
-    // === KUNCI: bubble up status apa adanya ===
-    if (!data?.success) {
-      return res.reply({
-        success: false,
-        query: q,
-        provider: data?.provider || null,
-        error: data?.message || 'Gagal mengambil lirik.'
-      }, { code: 200 });
-    }
+    const data = await src(q);
 
     return res.reply({
       success: true,
-      provider: data.provider,
-      query: data.query,
-      result: {
-        title: data.title,
-        artist: data.artist,
-        link: data.link,
-        thumbnail: data.thumbnail,
-        lyrics: data.lyrics
-      }
-    }, { code: 200 });
-  } catch (err) {
-    return res.reply({ success: false, error: String(err?.message || err) }, { code: 200 });
+      query: q,
+      title: data.title,
+      thumbnail: data.thumbnail,
+      url: data.url,
+      lyrics: data.lyrics // bisa null kalau cuma dapet snippet / link
+    });
+  } catch (error) {
+    console.error('Lyrics API Error:', error);
+
+    const msg =
+      typeof error === 'string'
+        ? error
+        : error?.message || JSON.stringify(error);
+
+    return res.reply(
+      {
+        success: false,
+        error: msg
+      },
+      { code: 500 }
+    );
   }
 };
 
-handler.alias = 'Lyrics Finder';
+handler.alias = 'Lyrics Search';
 handler.category = 'Search';
-handler.status = 'error';
 handler.params = {
-  text: { desc: 'Judul/artist atau potongan lirik', example: 'I wanna be yours' }
+  q: {
+    desc: 'Judul lagu / query untuk dicari di Genius',
+    example: 'The Weeknd Blinding Lights'
+  }
 };
 
 module.exports = handler;
