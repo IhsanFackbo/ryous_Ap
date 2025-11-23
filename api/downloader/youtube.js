@@ -47,7 +47,3 @@ handler.params = {
 };
 
 module.exports = handler;
-  }
-};
-
-module.exports = handler;
