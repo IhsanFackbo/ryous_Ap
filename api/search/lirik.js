@@ -9,46 +9,45 @@ let handler = async (res, req) => {
       return res.reply(
         {
           success: false,
-          error: 'Parameter q wajib diisi (judul lagu).'
+          error: 'Parameter "q" (judul lagu) wajib diisi',
         },
         { code: 400 }
       );
     }
 
-    const data = await src(q);
+    const result = await src(q); // panggil ai/lyrics.js
 
     return res.reply(
       {
-        success: data.success !== false,
+        success: true,
         query: q,
-        title: data.title || null,
-        thumbnail: data.thumbnail || null,
-        url: data.url || null,
-        lyrics: data.lyrics || null,
-        error: data.error || null
+        title: result.title || null,
+        thumbnail: result.thumbnail || null,
+        url: result.url || null,
+        lyrics: result.lyrics || null,
       },
       { code: 200 }
     );
-  } catch (e) {
-    console.error('Lyrics API Error:', e);
+  } catch (error) {
+    console.error("Lyrics API Error:", error);
 
     return res.reply(
       {
         success: false,
-        error: e?.message || String(e)
+        error: error?.message || String(error),
       },
       { code: 500 }
     );
   }
 };
 
-handler.alias = 'Lyrics Search';
-handler.category = 'Music';
+handler.alias = "Lyrics Search";
+handler.category = "Search";
 handler.params = {
   q: {
-    desc: 'Judul lagu yang ingin dicari',
-    example: 'Olivia Rodrigo – Drivers License'
-  }
+    desc: "Judul lagu / query untuk dicari liriknya",
+    example: "Dark Side Alan Walker",
+  },
 };
 
 module.exports = handler;
