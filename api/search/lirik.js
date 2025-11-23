@@ -1,5 +1,5 @@
 // api/lyrics.js
-const src = scrape('ai/lyrics');
+const src = scrape('search/lirik');
 
 let handler = async (res, req) => {
   try {
@@ -36,7 +36,7 @@ let handler = async (res, req) => {
 };
 
 handler.alias = 'Lyrics Search';
-handler.category = 'Music';
+handler.category = 'Search';
 handler.params = {
   q: {
     desc: 'Judul lagu / query untuk dicari liriknya',
