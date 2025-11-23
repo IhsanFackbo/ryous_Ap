@@ -4,44 +4,29 @@ const src = scrape('search/lirik');
 let handler = async (res, req) => {
   try {
     const { q } = req.query || {};
-
     if (!q) {
-      // Bad request, tapi tetap kirim msg string (bukan object)
       return res.reply(
-        {
-          status: false,
-          msg: 'Param "q" (judul lagu) wajib diisi',
-        },
+        { status: false, msg: 'Param "q" (judul lagu) wajib diisi' },
         { code: 400 }
       );
     }
 
-    const data = await src(q); // { status, result?, msg? }
+    const data = await src(q); // { status, msg, result, source }
 
-    // Di sini TIDAK lempar error lagi, cukup balikin apa adanya
-    // Biar client bisa cek data.status
+    // Selalu 200, biar client cek sendiri status true/false
     return res.reply(data, { code: 200 });
-  } catch (err) {
-    console.error("Lyrics API Fatal:", err);
-
-    // DI SINI JUGA JANGAN KIRIM OBJECT RAW KE STRING
+  } catch (e) {
     return res.reply(
-      {
-        status: false,
-        msg: err?.message || String(err),
-      },
+      { status: false, msg: e?.message || String(e) },
       { code: 500 }
     );
   }
 };
 
 handler.alias = 'Lyrics Search';
-handler.category = 'Search';
+handler.category = 'Music';
 handler.params = {
-  q: {
-    desc: 'Judul lagu / query untuk dicari liriknya',
-    example: 'Dark Side Alan Walker',
-  },
+  q: { desc: 'Judul lagu', example: 'Dark Side Alan Walker' },
 };
 
 module.exports = handler;
