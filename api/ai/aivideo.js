@@ -1,4 +1,4 @@
-const aiVideo = scrape("ai/aivideo");
+const src = scrape("ai/aivideo");
 
 let handler = async (res, req) => {
   try {
