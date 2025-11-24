@@ -2,45 +2,48 @@ const aiVideo = scrape("ai/aivideo");
 
 let handler = async (res, req) => {
   try {
-    const { prompt, imageUrl } = req.query;
+    const q = req.query || {};
+    const prompt = q.prompt;
+    const image = q.image || null;
 
-    if (!prompt)
-      return res.reply({ success: false, error: "Prompt wajib diisi!" });
-
-    let imageBuffer;
-
-    // Jika user kirim URL gambar
-    if (imageUrl) {
-      const axios = require("axios");
-      const imgRes = await axios.get(imageUrl, { responseType: "arraybuffer" });
-      imageBuffer = Buffer.from(imgRes.data);
-    } 
-    
-    // Jika kirim file (binary upload)
-    else if (req.file) {
-      imageBuffer = req.file.buffer;
-    } 
-    
-    else {
+    if (!prompt) {
       return res.reply({
         success: false,
-        error: "Harus kirim imageUrl atau upload file!"
+        message: 'Parameter "prompt" wajib diisi'
       });
     }
 
-    const result = await aiVideo(imageBuffer, prompt);
-    res.reply(result);
+    const result = await src({ prompt, image });
 
+    return res.reply({
+      success: true,
+      owner: "@IsanAndres",
+      result,
+      timestamp: new Date().toISOString()
+    });
   } catch (e) {
-    res.reply({ success: false, message: e.message }, { code: 500 });
+    res.reply(
+      {
+        success: false,
+        message: e.message || String(e)
+      },
+      { code: 500 }
+    );
   }
 };
 
-handler.alias = "AI Image-to-Video";
+handler.alias = "VEO 3 AI Video Generator";
 handler.category = "AI";
 handler.params = {
-  prompt: { desc: "Deskripsi video", example: "flying dragon in neon city" },
-  imageUrl: { desc: "URL gambar optional" }
+  prompt: {
+    desc: "Prompt deskripsi video",
+    example:
+      "Make it look like the character is being blown by wind in front"
+  },
+  image: {
+    desc: "Image URL (optional)",
+    example: "https://tmpfiles.org/xxxxx.png"
+  }
 };
 
 module.exports = handler;
