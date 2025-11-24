@@ -1,32 +1,39 @@
-// api/lyrics.js
-const src = scrape('search/lirik');
+const src = scrape("search/lirik");
 
 let handler = async (res, req) => {
-  try {
-    const { q } = req.query || {};
-    if (!q) {
-      return res.reply(
-        { status: false, msg: 'Param "q" (judul lagu) wajib diisi' },
-        { code: 400 }
-      );
+    try {
+        const q = req.query.q || req.query.title;
+
+        if (!q) {
+            return res.reply({
+                success: false,
+                message: 'Parameter "q" atau "title" wajib diisi'
+            });
+        }
+
+        const result = await src(q);
+
+        return res.reply({
+            success: true,
+            owner: "@IsanAndres",
+            result,
+            timestamp: new Date().toISOString()
+        });
+    } catch (e) {
+        res.reply(
+            { success: false, message: e.message || String(e) },
+            { code: 500 }
+        );
     }
-
-    const data = await src(q); // { status, msg, result, source }
-
-    // Selalu 200, biar client cek sendiri status true/false
-    return res.reply(data, { code: 200 });
-  } catch (e) {
-    return res.reply(
-      { status: false, msg: e?.message || String(e) },
-      { code: 500 }
-    );
-  }
 };
 
-handler.alias = 'Lyrics Search';
-handler.category = 'Music';
+handler.alias = "Lyrics Search";
+handler.category = "Search";
 handler.params = {
-  q: { desc: 'Judul lagu', example: 'Dark Side Alan Walker' },
+    q: {
+        desc: "Judul lagu atau kata kunci pencarian",
+        example: "bunga maaf"
+    }
 };
 
 module.exports = handler;
