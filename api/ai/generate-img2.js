@@ -1,4 +1,4 @@
-nconst src = scrape('ai/unres');
+const src = scrape('ai/unres');
 
 let handler = async (res, req) => {
     try {
