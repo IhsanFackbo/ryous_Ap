@@ -1,4 +1,4 @@
-// api/unlimitedai.js
+// api/ai/ChatAi-unli.js
 
 const src = scrape("ai/Ai-chat-unlimited");
 
@@ -11,7 +11,7 @@ let handler = async (res, req) => {
       return res.reply({
         success: false,
         message:
-          'Query "q" wajib diisi. Contoh: /api/unlimitedai?q=hi! apa kabar?'
+          'Query "q" wajib diisi. Contoh: /api/ai/ChatAi-unli?q=Halo apa kabar?'
       });
     }
 
@@ -33,7 +33,6 @@ let handler = async (res, req) => {
       },
       timestamp: new Date().toISOString()
     });
-
   } catch (e) {
     return res.reply(
       {
@@ -45,12 +44,12 @@ let handler = async (res, req) => {
   }
 };
 
-handler.alias = "UnlimitedAI Chat";
+handler.alias = "Chat AI Unlimited";
 handler.category = "AI";
 handler.params = {
   q: {
     desc: "Pertanyaan untuk UnlimitedAI",
-    example: "Halo, apa kabar?"
+    example: "Halo, jelaskan teori relativitas."
   }
 };
 
