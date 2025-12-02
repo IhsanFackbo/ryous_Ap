@@ -1,5 +1,5 @@
 const axios = require('axios');
-const ilaria = require('../../lib/scrape_file/Photo/Remini');
+const src = scrape('Photo/Remini');
 
 function sendJson(res, obj, code = 200) {
   try { res.statusCode = code; } catch {}
