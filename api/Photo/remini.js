@@ -1,7 +1,7 @@
 const axios = require('axios');
-const remini = require('../../lib/scrape_file/Photo/Remini');
+const ilaria = require('../../lib/scrape_file/Photo/remini');
 
-function sendJson(res, obj, code=200) {
+function sendJson(res, obj, code = 200) {
   try { res.statusCode = code; } catch {}
   try { res.setHeader('Content-Type','application/json'); } catch {}
   res.end(JSON.stringify(obj));
@@ -17,7 +17,9 @@ async function readBodyAsBuffer(req) {
 
 let handler = async (res, req) => {
   const q = req.query || {};
-  const mode = String(q.mode || 'enhance').toLowerCase();
+  const model = String(q.model || 'RealESRGAN_x4plus');
+  const resolution = Number(q.resolution || 4);
+  const face = String(q.face || 'false') === 'true';
   const imgUrl = q.url;
 
   try {
@@ -30,7 +32,8 @@ let handler = async (res, req) => {
         headers: { 'User-Agent': 'Mozilla/5.0' }
       });
       inputBuf = Buffer.from(data);
-    } else if (/^image\//i.test(String(req.headers['content-type']||''))) {
+
+    } else if (/^image\//i.test(String(req.headers['content-type'] || ''))) {
       inputBuf = await readBodyAsBuffer(req);
     }
 
@@ -39,37 +42,45 @@ let handler = async (res, req) => {
         success:false,
         error:'Invalid parameters. Kirim ?url=<gambar> atau POST body image/*',
         usage:{
-          GET:'/photo/remini?mode=enhance&url=https://host/img.jpg',
-          POST:'curl -X POST -H "Content-Type: image/jpeg" --data-binary @in.jpg https://host/photo/remini?mode=dehaze'
+          GET:'/photo/ilaria?model=RealESRGAN_x4plus&resolution=4&url=https://host/image.jpg',
+          POST:'curl -X POST -H "Content-Type: image/jpeg" --data-binary @in.jpg https://host/photo/ilaria'
         }
       }, 400);
     }
 
-    const out = await remini(inputBuf, mode);
+    // Proses via scraper
+    const out = await ilaria(inputBuf, {
+      model,
+      resolution,
+      face
+    });
 
-    // Sukses → kirim buffer image
-    try { res.setHeader('Content-Type','image/jpeg'); } catch {}
-    try { res.setHeader('Content-Disposition', `inline; filename="remini_${mode}.jpg"`); } catch {}
+    // Sukses → kirim buffer
+    try { res.setHeader('Content-Type', 'image/jpeg'); } catch {}
+    try { res.setHeader('Content-Disposition', `inline; filename="ilaria_upscaled.jpg"`); } catch {}
+
     return res.end(out);
 
   } catch (e) {
-    // Jangan “[object Object]” lagi — selalu JSON jelas
-    console.error('REMINI ERROR:', e);
+    console.error('ILARIA ERROR:', e);
     return sendJson(res, {
       success:false,
-      provider:'vyro',
-      mode,
+      provider:'ilaria',
+      model,
+      resolution,
       url: imgUrl || '(body)',
       error: e.message || String(e)
     }, 500);
   }
 };
 
-handler.alias = 'Remini (Vyro)';
+handler.alias = 'Ilaria Upscaler';
 handler.category = 'Photo';
 handler.params = {
-  mode:{desc:'enhance|recolor|dehaze', example:'enhance'},
-  url:{desc:'URL gambar (opsional jika POST body biner)', example:'https://.../image.jpg'}
+  model:{desc:'Model RealESRGAN', example:'RealESRGAN_x4plus'},
+  resolution:{desc:'1-6', example:'4'},
+  face:{desc:'Face enhance true/false', example:'true'},
+  url:{desc:'URL gambar', example:'https://.../image.jpg'}
 };
 
 module.exports = handler;
