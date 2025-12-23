@@ -1,0 +1,22 @@
+<%- include('partials/header', {
+  title: name,
+  description
+}) %>
+
+<section class="max-w-xl">
+  <h1 class="text-3xl font-bold mb-3">
+    Welcome to <%= name %>
+  </h1>
+
+  <p class="text-sm text-slate-600 dark:text-slate-300">
+    <%= description %>
+  </p>
+
+  <div class="mt-6">
+    <a href="/api" class="gbtn text-xs">
+      Explore API
+    </a>
+  </div>
+</section>
+
+<%- include('partials/footer', { name }) %>
