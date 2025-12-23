@@ -1,0 +1,34 @@
+<div id="overlay"
+  onclick="toggleMenu()"
+  class="fixed inset-0 bg-black/40 z-40 hidden">
+</div>
+
+<aside id="drawer"
+  class="fixed top-0 left-0 h-full w-72 bg-white dark:bg-slate-900 z-50
+         -translate-x-full transition-transform duration-300">
+
+  <div class="flex items-center justify-between p-4 border-b dark:border-slate-800">
+    <span class="font-bold text-lg"><%= name %></span>
+    <button onclick="toggleMenu()">
+      <span class="material-icons-outlined">close</span>
+    </button>
+  </div>
+
+  <nav class="p-4 space-y-3 text-sm">
+    <a href="/" class="flex items-center gap-3 p-3 border rounded-xl">
+      <span class="material-icons-outlined">home</span> Home
+    </a>
+
+    <a href="/api" class="flex items-center gap-3 p-3 border rounded-xl">
+      <span class="material-icons-outlined">code</span> Codes
+    </a>
+
+    <a href="/docs" class="flex items-center gap-3 p-3 border rounded-xl">
+      <span class="material-icons-outlined">public</span> Web Parser
+    </a>
+
+    <a href="/about" class="flex items-center gap-3 p-3 border rounded-xl">
+      <span class="material-icons-outlined">person</span> Admin
+    </a>
+  </nav>
+</aside>
