@@ -1,22 +1,120 @@
 <%- include('partials/header', {
-  title: name,
-  description
+  title: 'API Documentation',
+  description: 'Dokumentasi resmi penggunaan API'
 }) %>
 
-<section class="max-w-xl">
-  <h1 class="text-3xl font-bold mb-3">
-    Welcome to <%= name %>
-  </h1>
+<!-- INTRO -->
+<section id="intro" class="max-w-3xl mb-16 scroll-mt-20">
+  <h1 class="text-3xl font-bold mb-4">📘 API Documentation</h1>
 
-  <p class="text-sm text-slate-600 dark:text-slate-300">
-    <%= description %>
+  <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+    <b><%= name %></b> adalah REST API yang menyediakan berbagai endpoint
+    untuk automation, scraping, AI tools, dan media processing.
+    API ini dirancang agar mudah digunakan dan fleksibel.
   </p>
 
-  <div class="mt-6">
-    <a href="/api" class="gbtn text-xs">
-      Explore API
-    </a>
+  <div class="mt-6 flex gap-3">
+    <a href="#usage" class="gbtn text-xs">Cara Pakai</a>
+    <a href="#platform" class="gbtn text-xs">Platform</a>
+    <a href="#contact" class="gbtn text-xs">Hubungi Admin</a>
   </div>
 </section>
+
+<!-- BASE URL -->
+<section class="max-w-3xl mb-16 scroll-mt-20">
+  <h2 class="text-xl font-bold mb-3">🔗 Base URL</h2>
+
+  <pre class="text-xs bg-slate-900 text-white p-4 rounded-xl">
+https://your-domain.com
+  </pre>
+</section>
+
+<!-- USAGE -->
+<section id="usage" class="max-w-3xl mb-20 scroll-mt-20">
+  <h2 class="text-xl font-bold mb-4">⚙️ Cara Penggunaan</h2>
+
+  <p class="text-sm text-slate-600 dark:text-slate-300 mb-6">
+    API menggunakan metode HTTP standar. Response dikembalikan dalam format JSON.
+  </p>
+
+  <!-- STEP 1 -->
+  <div class="mb-10">
+    <h3 class="font-semibold mb-2">1️⃣ Request via Browser / Fetch</h3>
+
+    <img
+      src="/img/api-browser.png"
+      alt="API via browser"
+      class="rounded-xl border mb-3 w-full">
+
+    <pre class="text-xs bg-slate-900 text-white p-3 rounded-xl">
+GET /api/example?text=halo
+    </pre>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="mb-10">
+    <h3 class="font-semibold mb-2">2️⃣ Request via Postman</h3>
+
+    <img
+      src="/img/api-postman.png"
+      alt="API via Postman"
+      class="rounded-xl border mb-3 w-full">
+
+    <pre class="text-xs bg-slate-900 text-white p-3 rounded-xl">
+{
+  "status": true,
+  "result": "halo"
+}
+    </pre>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="mb-10">
+    <h3 class="font-semibold mb-2">3️⃣ Request via cURL</h3>
+
+    <img
+      src="/img/api-curl.png"
+      alt="API via curl"
+      class="rounded-xl border mb-3 w-full">
+
+    <pre class="text-xs bg-slate-900 text-white p-3 rounded-xl">
+curl -X GET "https://your-domain.com/api/example?text=halo"
+    </pre>
+  </div>
+</section>
+
+<!-- PLATFORM -->
+<section id="platform" class="max-w-3xl mb-20 scroll-mt-20">
+  <h2 class="text-xl font-bold mb-4">🧩 Bisa Digunakan Di</h2>
+
+  <ul class="list-disc list-inside text-sm text-slate-600 dark:text-slate-300 space-y-2">
+    <li>Website (Fetch / Axios)</li>
+    <li>Mobile App (Android, iOS, Flutter)</li>
+    <li>Bot (WhatsApp, Telegram, Discord)</li>
+    <li>Backend (Node.js, PHP, Python)</li>
+    <li>Automation & CLI</li>
+  </ul>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="max-w-3xl scroll-mt-20">
+  <h2 class="text-xl font-bold mb-4">📞 Hubungi Admin</h2>
+
+  <div class="p-4 border rounded-xl">
+    <p class="text-sm mb-3">
+      Jika ada error atau request fitur baru, hubungi admin:
+    </p>
+
+    <ul class="text-sm space-y-2">
+      <li>📱 WhatsApp: <a href="#" class="text-cyan-500">+62xxxx</a></li>
+      <li>💬 Telegram: <a href="#" class="text-cyan-500">@username</a></li>
+      <li>💻 GitHub: <a href="#" class="text-cyan-500">github.com/username</a></li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  html { scroll-behavior: smooth; }
+</style>
 
 <%- include('partials/footer', { name }) %>
