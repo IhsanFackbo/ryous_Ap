@@ -3,495 +3,54 @@
   description: categoryDesc
 }) %>
 
-<!-- Header -->
-<div class="flex flex-col text-left mb-6">
-  <a href="/" class="inline-flex items-center text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white mb-4">
-    <span class="mr-3">←</span> Back to Categories
-  </a>
+<div class="mb-6">
+  <a href="/" class="text-xs text-slate-500">← Back</a>
 
-  <h2 class="flex flex-wrap items-center gap-2 text-3xl font-bold">
-    <span class="flex-grow"><%= categoryName %></span>
-    <span class="inline-flex items-center rounded-xl px-3 py-1 text-[10px] font-extrabold text-white
-                 bg-gradient-to-r from-cyan-500 via-indigo-500 to-violet-600">
-      <%= category.items.length %> Endpoints
-    </span>
-  </h2>
-
-  <p class="text-slate-600 dark:text-slate-300 text-xs mt-2 max-w-2xl"><%= categoryDesc %></p>
+  <h2 class="text-2xl font-bold mt-2"><%= categoryName %></h2>
+  <p class="text-xs text-slate-500">
+    <%= categoryDesc %> • <%= category.items.length %> endpoints
+  </p>
 </div>
 
-<!-- Search -->
-<div class="flex items-center justify-between mb-4">
-  <div class="flex-1 relative">
-    <span class="material-icons-outlined absolute left-3 top-3.5 text-slate-400">search</span>
-    <input id="searchInput" type="text" placeholder="Search endpoints..."
-      class="w-full rounded-xl border-slate-200 dark:border-slate-700
-             bg-white/80 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100
-             placeholder-slate-400 dark:placeholder-slate-500
-             pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand-300 transition" />
-    <div class="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/30 to-transparent
-                bg-[length:200%_100%] animate-shimmer dark:via-white/10"></div>
-  </div>
-</div>
+<div class="space-y-3">
+  <% category.items.forEach((endpoint, i) => { %>
+    <div class="border rounded-xl p-4">
+      <button onclick="toggleEndpoint(<%= i %>)"
+        class="w-full flex justify-between items-center text-left">
 
-<div id="content">
-  <div id="noResults" class="rounded-2xl border border-slate-200/70 bg-white/80 p-12 text-center shadow
-                           dark:bg-slate-800/60 dark:border-slate-700 hidden">
-    <h3 class="text-xs text-slate-600 dark:text-slate-300">No result found.</h3>
-  </div>
+        <div>
+          <span class="text-xs font-bold mr-2"><%= endpoint.method %></span>
+          <span class="font-mono text-sm"><%= endpoint.path %></span>
+          <div class="text-xs text-slate-500"><%= endpoint.alias %></div>
+        </div>
 
-  <div id="apiList" class="space-y-3">
-    <% category.items.forEach((endpoint, endpointIndex) => { %>
-      <div
-        class="rounded-2xl border border-slate-200/70 bg-white/80 p-4 transition hover:border-slate-300 shadow
-               dark:bg-slate-800/60 dark:border-slate-700 api-item group"
-        data-method="<%= endpoint.method %>"
-        data-path="<%= endpoint.path %>"
-        data-alias="<%= endpoint.alias %>">
+        <span id="endpoint-icon-<%= i %>" class="material-icons-outlined">
+          expand_more
+        </span>
+      </button>
 
-        <!-- Row -->
-        <button onclick="toggleEndpoint(<%= endpointIndex %>)" class="w-full text-left flex items-center justify-between">
-          <div class="flex items-center min-w-0 flex-1 gap-3">
-            <span class="px-3 py-1 text-[10px] font-extrabold text-white rounded-lg
-                         bg-gradient-to-r from-cyan-500 via-indigo-500 to-violet-600"><%= endpoint.method %></span>
-            <div class="flex flex-col min-w-0 flex-1">
-              <span class="font-semibold truncate max-w-[90%] font-mono text-sm" title="<%= endpoint.path %>"><%= endpoint.path %></span>
-              <span class="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[90%]" title="<%= endpoint.alias %>"><%= endpoint.alias %></span>
-            </div>
-          </div>
+      <div id="endpoint-<%= i %>" class="hidden mt-3">
+        <form
+          onsubmit="executeRequest(event,<%= i %>,'<%= endpoint.method %>','<%= endpoint.path %>','application/json')">
+          <button class="gbtn text-xs mt-2">Execute</button>
+        </form>
 
-          <div class="flex items-center gap-2">
-            <% if (endpoint.status === 'error') { %>
-              <span class="material-icons-outlined text-red-600">error</span>
-            <% } else if (endpoint.status === 'maintenance') { %>
-              <span class="material-icons-outlined text-yellow-600">warning</span>
-            <% } %>
-            <span class="material-icons-outlined transition-transform duration-150" id="endpoint-icon-<%= endpointIndex %>">expand_more</span>
-          </div>
-        </button>
-
-        <!-- Panel -->
-        <div id="endpoint-<%= endpointIndex %>" class="hidden mt-3 p-4 rounded-xl border border-slate-200 bg-slate-50/70
-                                                      dark:border-slate-700 dark:bg-slate-800/60">
-          <div class="text-slate-700 dark:text-slate-200 font-bold text-xs mb-2 flex items-center">
-            <span class="material-icons-outlined text-sm mr-1">play_arrow</span> TRY IT OUT
-          </div>
-
-          <% if (endpoint.status === 'error') { %>
-            <div class="rounded-xl border border-red-200 bg-red-50/80 p-3 mb-3 dark:border-red-500/40 dark:bg-red-100/10">
-              <div class="flex items-start">
-                <span class="material-icons-outlined text-red-600 dark:text-red-400 text-sm mr-2 mt-0.5">error</span>
-                <div>
-                  <div class="text-xs font-semibold text-red-800 dark:text-red-300 mb-1">Endpoint Error</div>
-                  <div class="text-xs text-red-700 dark:text-red-200/80">This endpoint is currently unavailable.</div>
-                </div>
-              </div>
-            </div>
-          <% } else if (endpoint.status === 'maintenance') { %>
-            <div class="rounded-xl border border-yellow-200 bg-yellow-50/80 p-3 mb-3 dark:border-yellow-500/40 dark:bg-yellow-100/10">
-              <div class="flex items-start">
-                <span class="material-icons-outlined text-yellow-600 dark:text-yellow-400 text-sm mr-2 mt-0.5">warning</span>
-                <div>
-                  <div class="text-xs font-semibold text-yellow-800 dark:text-yellow-300 mb-1">Under Maintenance</div>
-                  <div class="text-xs text-yellow-700 dark:text-yellow-200/80">Responses may be unstable.</div>
-                </div>
-              </div>
-            </div>
-          <% } %>
-
-          <form id="form-<%= endpointIndex %>"
-                onsubmit="executeRequest(event, <%= endpointIndex %>, '<%= endpoint.method %>', '<%= endpoint.path %>', '<%= endpoint.contentType || 'application/json' %>')">
-
-            <% if (endpoint.routeParameters && endpoint.routeParameters.length > 0) { %>
-              <div class="mb-4 rounded-xl border border-blue-200 bg-blue-50/70 p-3 dark:border-blue-500/30 dark:bg-blue-500/10">
-                <div class="text-xs font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center">
-                  <span class="material-icons-outlined text-sm mr-1">route</span> ROUTE PARAMETERS
-                </div>
-                <div class="space-y-2">
-                  <% endpoint.routeParameters.forEach(function(param){ %>
-                    <div>
-                      <label class="block text-xs font-medium text-slate-600 dark:text-slate-300">
-                        <%= param.name %> <span class="text-red-500">*</span>
-                      </label>
-                      <div class="text-xs text-slate-500 dark:text-slate-400 mb-1"><%= param.description %></div>
-
-                      <% if (param.options && param.options.length) { %>
-                        <select name="route_<%= param.name %>"
-                                class="w-full rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-300">
-                          <% param.options.forEach(function(option, i){ %>
-                            <option value="<%= option %>" <%= i===0 ? 'selected' : '' %>><%= option %></option>
-                          <% }) %>
-                        </select>
-                      <% } else { %>
-                        <input type="text" name="route_<%= param.name %>"
-                               class="w-full rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-300"
-                               placeholder="<%= param.example || ('Enter ' + param.name + '...') %>" required>
-                      <% } %>
-                    </div>
-                  <% }) %>
-                </div>
-              </div>
-            <% } %>
-
-            <% if (endpoint.parameters) { %>
-              <div class="mb-4 space-y-2">
-                <% if (endpoint.parameters.required && endpoint.parameters.required.length) { %>
-                  <% endpoint.parameters.required.forEach(function(param){ %>
-                    <div>
-                      <label class="block text-xs font-medium text-slate-600 dark:text-slate-300">
-                        <%= typeof param === 'string' ? param : param.name %> <span class="text-red-500">*</span>
-                      </label>
-                      <% if (typeof param === 'object') { %>
-                        <div class="text-xs text-slate-500 dark:text-slate-400 mb-1"><%= param.description %></div>
-                      <% } %>
-
-                      <% if (typeof param === 'object' && param.options && param.options.length) { %>
-                        <select name="<%= param.name %>"
-                                class="w-full rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-300" required>
-                          <% param.options.forEach(function(opt, i){ %>
-                            <option value="<%= opt %>" <%= i===0 ? 'selected' : '' %>><%= opt %></option>
-                          <% }) %>
-                        </select>
-                      <% } else { %>
-                        <input type="<%= typeof param === 'object' && param.type === 'number' ? 'number' : 'text' %>"
-                               name="<%= typeof param === 'string' ? param : param.name %>"
-                               class="w-full rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-300"
-                               placeholder="<%= typeof param === 'object' && param.example ? param.example : 'Enter ' + (typeof param === 'string' ? param : param.name) + '...' %>" required>
-                      <% } %>
-                    </div>
-                  <% }) %>
-                <% } %>
-
-                <% if (endpoint.parameters.optional && endpoint.parameters.optional.length) { %>
-                  <% endpoint.parameters.optional.forEach(function(param){ %>
-                    <div>
-                      <label class="block text-xs font-medium text-slate-600 dark:text-slate-300">
-                        <%= typeof param === 'string' ? param : param.name %>
-                      </label>
-                      <% if (typeof param === 'object') { %>
-                        <div class="text-xs text-slate-500 dark:text-slate-400 mb-1"><%= param.description %></div>
-                      <% } %>
-
-                      <% if (typeof param === 'object' && param.options && param.options.length) { %>
-                        <select name="<%= param.name %>"
-                                class="w-full rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-300">
-                          <% param.options.forEach(function(opt, i){ %>
-                            <option value="<%= opt %>" <%= i===0 ? 'selected' : '' %>><%= opt %></option>
-                          <% }) %>
-                        </select>
-                      <% } else { %>
-                        <input type="<%= typeof param === 'object' && param.type === 'number' ? 'number' : 'text' %>"
-                               name="<%= typeof param === 'string' ? param : param.name %>"
-                               class="w-full rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-300"
-                               placeholder="<%= typeof param === 'object' && param.example ? param.example : 'Enter ' + (typeof param === 'string' ? param : param.name) + ' (optional)...' %>">
-                      <% } %>
-                    </div>
-                  <% }) %>
-                <% } %>
-              </div>
-            <% } %>
-
-            <% if (endpoint.formData) { %>
-              <div class="mb-4 space-y-3">
-                <% Object.keys(endpoint.formData).forEach(function(field){ %>
-                  <div>
-                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
-                      <%= field %> <% if (endpoint.formData[field].includes('required')) { %><span class="text-red-500">*</span><% } %>
-                    </label>
-                    <% if (field === 'image' || endpoint.formData[field].includes('file')) { %>
-                      <input type="file" name="<%= field %>" class="w-full rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 focus:ring-2 focus:ring-brand-300" <% if (endpoint.formData[field].includes('required')) { %>required<% } %>>
-                    <% } else { %>
-                      <input type="text" name="<%= field %>" class="w-full rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:ring-2 focus:ring-brand-300" placeholder="Enter <%= field %>..." <% if (endpoint.formData[field].includes('required')) { %>required<% } %>>
-                    <% } %>
-                  </div>
-                <% }) %>
-              </div>
-            <% } %>
-
-            <% if (endpoint.body && !endpoint.formData) { %>
-              <div class="mb-3">
-                <textarea 
-                  name="body" 
-                  rows="8" 
-                  class="w-full rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-y focus:ring-2 focus:ring-brand-300"
-                  placeholder='Type plain text (e.g. hai) or paste JSON...'><%= typeof endpoint.body === 'object' ? JSON.stringify(endpoint.body, null, 2) : '' %></textarea>
-                <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">Modify the JSON as needed.</div>
-              </div>
-            <% } %>
-
-            <div class="mt-2">
-              <button type="submit" class="gbtn text-xs" <% if (endpoint.status === 'error' || endpoint.status === 'maintenance') { %>disabled<% } %>>
-                Execute
-              </button>
-              <button type="button" id="clear-<%= endpointIndex %>" onclick="clearResponse(<%= endpointIndex %>)"
-                      class="hidden ml-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-900 dark:text-slate-100 hover:border-slate-400 dark:hover:border-slate-500">
-                Clear
-              </button>
-            </div>
-          </form>
-
-          <!-- Response -->
-          <div id="response-<%= endpointIndex %>" class="hidden mt-4">
-            <div class="text-slate-700 dark:text-slate-200 font-bold text-xs mb-2 flex items-center">
-              <span class="material-icons-outlined text-sm mr-1">code</span> RESPONSE
-            </div>
-            <div class="bg-slate-900 text-white text-xs p-4 rounded-xl">
-              <div class="max-h-80 overflow-auto" id="response-content-<%= endpointIndex %>"></div>
-            </div>
-          </div>
-
-          <!-- CURL -->
-          <div id="curl-<%= endpointIndex %>" class="hidden mt-4">
-            <div class="text-slate-700 dark:text-slate-200 font-bold text-xs mb-2 flex items-center">
-              <span class="material-icons-outlined text-sm mr-1">terminal</span> CURL COMMAND
-            </div>
-            <div class="bg-slate-900 text-white text-xs p-4 rounded-xl">
-              <pre class="whitespace-pre-wrap overflow-auto max-h-40" id="curl-content-<%= endpointIndex %>"></pre>
-            </div>
-          </div>
-
-          <!-- Status Table -->
-          <div class="mt-4">
-            <div class="text-slate-700 dark:text-slate-200 font-bold text-xs mb-2 flex items-center">
-              <span class="material-icons-outlined text-sm mr-1">list</span> HTTP STATUS CODES
-            </div>
-            <div class="rounded-2xl border border-slate-200/70 bg-white/80 dark:border-slate-700 dark:bg-slate-800/60">
-              <div class="overflow-x-auto">
-                <table class="w-full text-xs">
-                  <thead class="bg-slate-50 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-700">
-                    <tr>
-                      <th class="px-4 py-2 text-left font-semibold">Code</th>
-                      <th class="px-4 py-2 text-left font-semibold">Description</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/70">
-                      <td class="px-4 py-2"><div class="flex items-center"><span class="material-icons-outlined text-green-500 text-sm mr-2">check_circle</span><span class="font-mono font-semibold text-green-500">200</span></div></td>
-                      <td class="px-4 py-2">OK - Request successful</td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/70">
-                      <td class="px-4 py-2"><div class="flex items-center"><span class="material-icons-outlined text-red-500 text-sm mr-2">error</span><span class="font-mono font-semibold text-red-500">400</span></div></td>
-                      <td class="px-4 py-2">Bad Request - Invalid parameters</td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/70">
-                      <td class="px-4 py-2"><div class="flex items-center"><span class="material-icons-outlined text-red-500 text-sm mr-2">error</span><span class="font-mono font-semibold text-red-500">405</span></div></td>
-                      <td class="px-4 py-2">Method Not Allowed</td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/70">
-                      <td class="px-4 py-2"><div class="flex items-center"><span class="material-icons-outlined text-yellow-500 text-sm mr-2">warning</span><span class="font-mono font-semibold text-yellow-500">429</span></div></td>
-                      <td class="px-4 py-2">Too Many Requests</td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/70">
-                      <td class="px-4 py-2"><div class="flex items-center"><span class="material-icons-outlined text-red-500 text-sm mr-2">error</span><span class="font-mono font-semibold text-red-500">500</span></div></td>
-                      <td class="px-4 py-2">Internal Server Error</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-        </div> <!-- /panel -->
+        <div id="response-<%= i %>"
+             class="hidden mt-3 text-xs bg-slate-900 text-white p-3 rounded"></div>
       </div>
-    <% }) %>
-  </div>
+    </div>
+  <% }) %>
 </div>
-
-<!-- libs -->
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
-  let searchInput, apiItems, noResults, apiList;
-
   function toggleEndpoint(i){
     const el = document.getElementById(`endpoint-${i}`);
     const ic = document.getElementById(`endpoint-icon-${i}`);
-    if(el.classList.contains('hidden')){
-      el.classList.remove('hidden'); el.classList.add('slide-down'); ic.style.transform='rotate(180deg)';
-    }else{
-      el.classList.add('slide-up'); ic.style.transform='rotate(0deg)';
-      setTimeout(()=>{ el.classList.add('hidden'); el.classList.remove('slide-up','slide-down'); },180);
-    }
+    el.classList.toggle('hidden');
+    ic.textContent = el.classList.contains('hidden')
+      ? 'expand_more'
+      : 'expand_less';
   }
-
-  function clearResponse(i){
-    const r = document.getElementById(`response-${i}`);
-    const rc = document.getElementById(`response-content-${i}`);
-    const c = document.getElementById(`curl-${i}`);
-    const cc = document.getElementById(`curl-content-${i}`);
-    const btn = document.getElementById(`clear-${i}`);
-    r.classList.add('slide-up'); c.classList.add('slide-up');
-    setTimeout(()=>{ r.classList.add('hidden'); r.classList.remove('slide-up','slide-down'); rc.innerHTML='';
-                     c.classList.add('hidden'); c.classList.remove('slide-up','slide-down'); cc.textContent='';
-                     btn.classList.add('hidden'); },180);
-  }
-
-  async function executeRequest(e, i, method, path, contentType){
-    e.preventDefault();
-    const form = e.target;
-    const r = document.getElementById(`response-${i}`);
-    const rc = document.getElementById(`response-content-${i}`);
-    const curlBox = document.getElementById(`curl-${i}`);
-    const curlText = document.getElementById(`curl-content-${i}`);
-
-    let fullUrl = window.location.origin + path;
-    const fd = new FormData(form);
-    let curl = `curl -X ${method}`;
-
-    // route params
-    for (let [k,v] of fd.entries()){
-      if(k.startsWith('route_')){
-        const p = ':'+k.replace('route_','');
-        fullUrl = fullUrl.replace(p, encodeURIComponent(v));
-        path = path.replace(p, encodeURIComponent(v));
-      }
-    }
-    curl += ` "${fullUrl}"`;
-
-    try{
-      const cfg = { method, url: fullUrl, headers:{} };
-
-      if(method==='GET' || method==='HEAD'){
-        const params = {};
-        for (let [k,v] of fd.entries()){
-          if (v && k!=='body' && !k.startsWith('route_')) params[k]=v;
-        }
-        if(Object.keys(params).length){
-          cfg.params = params;
-          const qs = new URLSearchParams(params).toString();
-          fullUrl += `?${qs}`; path += `?${qs}`; curl = `curl -X ${method} "${fullUrl}"`;
-        }
-      }else{
-        if(contentType==='multipart/form-data'){
-          const nfd = new FormData(); const fields=[];
-          for (let [k,v] of fd.entries()){
-            if(!k.startsWith('route_')){ nfd.append(k,v);
-              fields.push(v instanceof File ? `-F "${k}=@${v.name}"` : `-F "${k}=${v}"`);
-            }
-          }
-          cfg.data = nfd; cfg.headers['Content-Type']='multipart/form-data';
-          curl += ` \\\n  ${fields.join(' \\\n  ')}`;
-        }else if(contentType==='application/json'){
-          // NEW: dukung JSON atau text/plain dari textarea
-          const txt = form.querySelector('textarea[name="body"]');
-          if (txt && txt.value.trim()){
-            const raw = txt.value.trim();
-            let asJson = null;
-            try { asJson = JSON.parse(raw); } catch(e){ asJson = null; }
-            if(asJson !== null){
-              cfg.headers['Content-Type'] = 'application/json';
-              cfg.data = asJson;
-              curl += ` \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(asJson)}'`;
-            }else{
-              cfg.headers['Content-Type'] = 'text/plain';
-              cfg.data = raw;
-              curl += ` \\\n  -H "Content-Type: text/plain" \\\n  --data-raw ${JSON.stringify(raw)}`;
-            }
-          }else{
-            const jsonBody = {};
-            for (let [k,v] of fd.entries()){
-              if (k!=='body' && !k.startsWith('route_') && v) jsonBody[k]=v;
-            }
-            if(Object.keys(jsonBody).length){
-              cfg.headers['Content-Type']='application/json';
-              cfg.data=jsonBody;
-              curl += ` \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(jsonBody)}'`;
-            }
-          }
-        }else{
-          // fallback lain → kirim sebagai JSON sederhana
-          const jsonBody = {};
-          for (let [k,v] of fd.entries()){
-            if (k!=='body' && !k.startsWith('route_') && v) jsonBody[k]=v;
-          }
-          if(Object.keys(jsonBody).length){
-            cfg.headers['Content-Type']='application/json';
-            cfg.data=jsonBody;
-            curl += ` \\\n  -H "Content-Type: application/json" \\\n  -d '${JSON.stringify(jsonBody)}'`;
-          }
-        }
-      }
-
-      curlText.textContent = curl;
-      curlBox.classList.remove('hidden'); curlBox.classList.add('slide-down');
-
-      rc.innerHTML = '<span class="text-white">Loading...</span>';
-      r.classList.remove('hidden'); r.classList.add('slide-down');
-
-      const res = await axios(cfg);
-      const ctype = res.headers['content-type'] || '';
-
-      const head = `<div class="text-slate-400 text-xs mb-3">
-        <pre>Method: ${method}</pre><pre>URL: ${fullUrl}</pre>
-        <pre>Status: ${res.status} ${res.statusText}</pre></div>`;
-
-      if(ctype.includes('application/json')){
-        const s = JSON.stringify(res.data, null, 2)
-          .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-          .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-        rc.innerHTML = head + `<pre class="text-white">${s}</pre>`;
-      }else if(ctype.includes('image/')){
-        cfg.responseType='blob'; const b = await axios(cfg);
-        const url = URL.createObjectURL(b.data);
-        rc.innerHTML = head + `<img src="${url}" class="max-w-full h-auto">`;
-      }else if(ctype.includes('audio/')){
-        cfg.responseType='blob'; const b = await axios(cfg);
-        const url = URL.createObjectURL(b.data);
-        rc.innerHTML = head + `<div class="text-white mb-2">Audio:</div>
-          <audio controls class="w-full mb-2"><source src="${url}" type="${ctype}"></audio>
-          <a href="${url}" download class="text-xs text-cyan-300 hover:text-cyan-200">Download Audio</a>`;
-      }else if(ctype.includes('video/')){
-        cfg.responseType='blob'; const b = await axios(cfg);
-        const url = URL.createObjectURL(b.data);
-        rc.innerHTML = head + `<div class="text-white mb-2">Video:</div>
-          <video controls class="w-full max-h-64 mb-2"><source src="${url}" type="${ctype}"></video>
-          <a href="${url}" download class="text-xs text-cyan-300 hover:text-cyan-200">Download Video</a>`;
-      }else if(ctype.includes('application/pdf')){
-        cfg.responseType='blob'; const b = await axios(cfg);
-        const url = URL.createObjectURL(b.data);
-        rc.innerHTML = head + `<div class="text-white mb-2">PDF:</div>
-          <iframe src="${url}" class="w-full h-64 border border-slate-600 mb-2"></iframe>
-          <a href="${url}" download class="text-xs text-cyan-300 hover:text-cyan-200">Download PDF</a>`;
-      }else{
-        rc.innerHTML = head + `<pre class="text-white whitespace-pre-wrap m-0">${res.data}</pre>`;
-      }
-    }catch(err){
-      let msg = err.message, stat = 'Error';
-      if(err.response){ stat = `${err.response.status} ${err.response.statusText}`;
-        msg = err.response.data?.message || err.response.data || err.message; }
-      else if(err.request){ msg = 'Network Error: ' + err.message; }
-
-      rc.innerHTML = `<div class="text-slate-400 text-xs mb-3">
-        <pre>Method: ${method}</pre><pre>URL: ${fullUrl}</pre><pre>Status: ${stat}</pre></div>
-        <pre class="text-white">Error: ${msg}</pre>`;
-      const r = document.getElementById(`response-${i}`);
-      r.classList.remove('hidden'); r.classList.add('slide-down');
-    }finally{
-      document.getElementById(`clear-${i}`).classList.remove('hidden');
-    }
-  }
-
-  function applyFilters(){
-    const term = searchInput.value.toLowerCase().trim();
-    let visible = 0;
-    apiItems.forEach(item=>{
-      const path = item.getAttribute('data-path').toLowerCase();
-      const alias = item.getAttribute('data-alias').toLowerCase();
-      const ok = path.includes(term) || alias.includes(term);
-      item.style.display = ok ? 'block' : 'none';
-      if(ok) visible++;
-    });
-    noResults.classList.toggle('hidden', !(visible===0 && apiItems.length>0));
-    apiList.classList.toggle('hidden', visible===0 && apiItems.length>0);
-  }
-
-  window.addEventListener('load', ()=>{
-    searchInput = document.getElementById('searchInput');
-    apiItems = document.querySelectorAll('.api-item');
-    noResults = document.getElementById('noResults');
-    apiList = document.getElementById('apiList');
-    searchInput.addEventListener('input', applyFilters);
-  });
 </script>
 
 <%- include('partials/footer', { name }) %>
