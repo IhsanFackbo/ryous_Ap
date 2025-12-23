@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="<%= description %>">
-  <meta name="theme-color" content="#0ea5e9">
-  <title><%= title %></title>
+  <meta name="description" content="<%= description || name %>">
+  <title><%= title || name %></title>
 
   <link rel="icon" href="/favicon.ico">
 
-  <!-- Anti flicker theme -->
+  <!-- Anti flicker dark mode -->
   <script>
     (function () {
       const t = localStorage.getItem('theme');
@@ -18,7 +17,6 @@
     })();
   </script>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -34,58 +32,56 @@
     }
   </script>
 
-  <!-- Icons & Fonts -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Ubuntu+Mono&display=swap" rel="stylesheet">
 
   <style>
     .gbtn{
-      display:inline-flex;
-      align-items:center;
-      gap:.4rem;
-      padding:.5rem .9rem;
-      border-radius:.75rem;
-      background:#0ea5e9;
-      color:#fff;
-      font-size:.75rem;
-      font-weight:700;
+      display:inline-flex;align-items:center;gap:.4rem;
+      padding:.5rem .9rem;border-radius:.7rem;
+      background:#0ea5e9;color:#fff;
+      font-size:.75rem;font-weight:700;
     }
-    .gbtn:hover{filter:brightness(1.05)}
   </style>
 </head>
 
-<body class="min-h-screen bg-slate-50 text-slate-900 antialiased
-             dark:bg-slate-900 dark:text-slate-100">
+<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
 
 <!-- TOP BAR -->
-<header class="flex items-center justify-between mb-6">
-  <a href="/" class="font-bold text-lg"><%= title %></a>
+<header class="flex items-center justify-between px-4 py-3 border-b dark:border-slate-800">
+  <button onclick="toggleMenu()" class="p-2 border rounded-lg">
+    <span class="material-icons-outlined">menu</span>
+  </button>
 
-  <!-- Theme toggle -->
-  <button id="themeToggle"
-    class="flex items-center gap-1 text-xs border rounded-lg px-3 py-2">
-    <span class="material-icons-outlined text-[16px]" id="themeIcon">dark_mode</span>
+  <span class="font-bold text-lg"><%= name %></span>
+
+  <button id="themeToggle" class="p-2 border rounded-lg">
+    <span class="material-icons-outlined" id="themeIcon">dark_mode</span>
   </button>
 </header>
 
-<script>
-  const btn = document.getElementById('themeToggle');
-  const icon = document.getElementById('themeIcon');
+<%- include('sidebar', { name }) %>
 
-  function sync(){
+<script>
+  function toggleMenu(){
+    document.getElementById('drawer').classList.toggle('-translate-x-full');
+    document.getElementById('overlay').classList.toggle('hidden');
+  }
+
+  const icon = document.getElementById('themeIcon');
+  function syncTheme(){
     icon.textContent = document.documentElement.classList.contains('dark')
       ? 'light_mode' : 'dark_mode';
   }
-  sync();
-
-  btn.onclick = () => {
+  syncTheme();
+  document.getElementById('themeToggle').onclick = () => {
     document.documentElement.classList.toggle('dark');
     localStorage.setItem(
       'theme',
       document.documentElement.classList.contains('dark') ? 'dark' : 'light'
     );
-    sync();
+    syncTheme();
   };
 </script>
 
-<main class="mx-auto max-w-5xl px-4 py-6">
+<main class="max-w-5xl mx-auto px-4 py-6">
