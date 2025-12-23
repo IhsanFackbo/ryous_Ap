@@ -5,6 +5,17 @@
 
 <h2 class="text-xl font-bold mb-4">API Categories</h2>
 
+<!-- SEARCH -->
+<div class="mb-4">
+  <input
+    id="searchInput"
+    type="text"
+    placeholder="Search API..."
+    class="w-full px-4 py-3 text-sm rounded-xl border
+           bg-white dark:bg-slate-800
+           placeholder-slate-400 dark:placeholder-slate-500">
+</div>
+
 <section class="space-y-2">
   <% endpoints.forEach(category => { 
     const slug = category.name.toLowerCase()
@@ -25,5 +36,18 @@
     </a>
   <% }) %>
 </section>
+<script>
+  const searchInput = document.getElementById('searchInput');
+  const categoryCards = document.querySelectorAll('.category-card');
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+
+    categoryCards.forEach(card => {
+      const data = card.getAttribute('data-search');
+      card.style.display = data.includes(q) ? 'block' : 'none';
+    });
+  });
+</script>
 
 <%- include('partials/footer', { name }) %>
