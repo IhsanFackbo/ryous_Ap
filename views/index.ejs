@@ -3,7 +3,7 @@
   description
 }) %>
 
-<h2 class="text-xl font-bold mb-4">API Categories</h2>
+<h1 class="text-2xl font-bold mb-4">API Categories</h1>
 
 <!-- SEARCH -->
 <div class="mb-4">
@@ -13,40 +13,80 @@
     placeholder="Search API..."
     class="w-full px-4 py-3 text-sm rounded-xl border
            bg-white dark:bg-slate-800
-           placeholder-slate-400 dark:placeholder-slate-500">
+           placeholder-slate-400 dark:placeholder-slate-500
+           focus:outline-none focus:ring-2 focus:ring-cyan-500">
 </div>
 
-<section class="space-y-2">
-  <% endpoints.forEach(category => { 
-    const slug = category.name.toLowerCase()
-      .replace(/[^a-z0-9\s-]/g,'')
-      .replace(/\s+/g,'-');
-  %>
-    <a href="/category/<%= slug %>"
-      class="block p-4 border rounded-xl">
+<p id="noResult"
+   class="hidden mb-4 text-sm text-slate-500">
+  API belum ada atau belum ditambahkan oleh owner.
+</p>
+
+<!-- CATEGORY LIST -->
+<section id="categoryList" class="space-y-3">
+  <% if (endpoints && endpoints.length > 0) { %>
+    <% endpoints.forEach(category => { 
+      const slug = category.name.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-');
+
+      const searchData = (
+        category.name + ' ' +
+        category.items.map(i =>
+          i.path + ' ' + (i.alias || '')
+        ).join(' ')
+      ).toLowerCase();
+    %>
+
+    <a
+      href="/category/<%= slug %>"
+      class="block p-4 border rounded-xl category-card
+             hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+      data-search="<%= searchData %>">
+
       <div class="flex justify-between items-center">
         <div>
-          <div class="font-semibold text-sm"><%= category.name %></div>
-          <div class="text-xs text-slate-500">
+          <h3 class="font-semibold text-sm">
+            <%= category.name %>
+          </h3>
+          <p class="text-xs text-slate-500">
             <%= category.items.length %> endpoints
-          </div>
+          </p>
         </div>
-        <span class="material-icons-outlined text-slate-400">chevron_right</span>
+
+        <span class="material-icons-outlined text-slate-400">
+          chevron_right
+        </span>
       </div>
+
     </a>
-  <% }) %>
+    <% }) %>
+  <% } else { %>
+    <p class="text-sm text-slate-500">
+      Belum ada API yang tersedia.
+    </p>
+  <% } %>
 </section>
+
+<!-- REALTIME SEARCH SCRIPT -->
 <script>
-  const searchInput = document.getElementById('searchInput');
-  const categoryCards = document.querySelectorAll('.category-card');
+  const input = document.getElementById('searchInput');
+  const cards = document.querySelectorAll('.category-card');
+  const noResult = document.getElementById('noResult');
 
-  searchInput.addEventListener('input', () => {
-    const q = searchInput.value.toLowerCase().trim();
+  input.addEventListener('input', () => {
+    const q = input.value.toLowerCase().trim();
+    let found = false;
 
-    categoryCards.forEach(card => {
-      const data = card.getAttribute('data-search');
-      card.style.display = data.includes(q) ? 'block' : 'none';
+    cards.forEach(card => {
+      const data = card.dataset.search;
+      const match = data.includes(q);
+
+      card.style.display = match ? 'block' : 'none';
+      if (match) found = true;
     });
+
+    noResult.classList.toggle('hidden', found || q === '');
   });
 </script>
 
