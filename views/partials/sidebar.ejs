@@ -1,26 +1,8 @@
-<div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+<div id="overlay" onclick="toggleMenu()"></div>
 
-<aside id="drawer" class="drawer">
-  <div class="drawer-header">Main Menu</div>
-
-  <a href="/" class="active">Documentation</a>
-  <a href="#">Contributors</a>
-
-  <a href="#">Available Categories</a>
-  <a href="#">Canvas</a>
-  <a href="#">Discovery</a>
-  <a href="#">Downloader</a>
-  <a href="#">Image Generation</a>
-  <a href="#">Music Generation</a>
-  <a href="#">Random</a>
-  <a href="#">Style Changer</a>
-  <a href="#">Text Generation</a>
-  <a href="#">Tools</a>
-  <a href="#">Video Generation</a>
+<aside id="drawer">
+  <h3><%= name %></h3>
+  <a href="/">Home</a>
+  <a href="/api">Documentation</a>
+  <a href="https://github.com/IxanAmd" target="_blank">GitHub</a>
 </aside>
-<script>
-function toggleMenu(){
-  drawer.classList.toggle('show');
-  overlay.classList.toggle('show');
-}
-</script>
