@@ -12,27 +12,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Ubuntu+Mono&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
-  <!-- Main CSS -->
-  <link rel="stylesheet" href="/public/css/app.css">
+  <!-- MAIN CSS (WAJIB) -->
+  <link rel="stylesheet" href="/css/app.css">
 </head>
 
 <body>
 
-<!-- TOP BAR -->
 <header class="topbar">
-  <button class="icon-btn" onclick="toggleMenu()" aria-label="Menu">
+  <button class="icon-btn" onclick="toggleMenu()">
     <span class="material-icons-outlined">menu</span>
   </button>
 
-  <div style="font-weight:800;letter-spacing:.4px">
+  <div style="font-weight:800">
     <%= name %>
   </div>
 
   <div style="width:24px"></div>
 </header>
 
-<!-- SIDEBAR -->
 <%- include('sidebar', { name }) %>
 
-<!-- MAIN CONTENT -->
 <main>
