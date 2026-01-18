@@ -2,137 +2,104 @@
   title: categoryName,
   description: categoryDesc,
   name,
-  showGetStarted: false
+  showGetStarted:false
 }) %>
 
-<!-- CATEGORY HEADER -->
-<section style="margin-bottom:24px">
-  <h1 style="margin:0 0 6px 0"><%= categoryName %></h1>
-  <p style="opacity:.75;max-width:600px">
-    <%= categoryDesc %>
-  </p>
+<section class="category-head">
+  <h1><%= categoryName %></h1>
+  <p><%= categoryDesc %></p>
 </section>
 
-<!-- ENDPOINT LIST -->
-<section>
+<section class="endpoint-list">
+
 <% category.items.forEach((ep,i)=>{ %>
 
   <div class="card">
 
     <!-- ENDPOINT BAR -->
-    <div class="endpoint" onclick="toggleTry(<%= i %>)" style="cursor:pointer">
-      <span style="
-        background:rgba(0,200,255,.15);
-        color:#7fe7ff;
-        padding:4px 10px;
-        border-radius:999px;
-        font-size:12px;
-        font-weight:600">
-        <%= ep.method %>
-      </span>
-
-      <span style="flex:1;margin-left:10px">
-        <%= ep.path %>
-      </span>
-
-      <span class="material-icons-outlined" id="icon-<%= i %>">
-        expand_more
-      </span>
+    <div class="endpoint-bar" onclick="toggleTry(<%= i %>)">
+      <span class="method"><%= ep.method %></span>
+      <span class="path"><%= ep.path %></span>
+      <span id="icon-<%= i %>">⌄</span>
     </div>
 
     <!-- TRY PANEL -->
-    <div id="try-<%= i %>" style="
-      display:none;
-      margin-top:12px;
-      animation:fade .25s ease">
+    <div class="try-box" id="try-<%= i %>">
 
       <% if(ep.alias){ %>
-        <p style="opacity:.7;margin-bottom:8px">
-          <%= ep.alias %>
-        </p>
+        <p class="alias"><%= ep.alias %></p>
       <% } %>
 
-      <!-- INPUT -->
-      <input
-        id="input-<%= i %>"
-        placeholder="Masukkan query (contoh: halo)"
-        style="
-          width:100%;
-          padding:12px;
-          border-radius:12px;
-          border:1px solid rgba(255,255,255,.08);
-          background:rgba(0,0,0,.25);
-          color:#fff;
-          outline:none"
-      />
+      <form onsubmit="executeAPI(event,<%= i %>,'<%= ep.path %>','<%= ep.method %>')">
 
-      <!-- ACTION -->
-      <button
-        onclick="executeAPI(<%= i %>,'<%= ep.path %>','<%= ep.method %>')"
-        style="
-          margin-top:10px;
-          padding:10px 16px;
-          border-radius:12px;
-          border:none;
-          background:#0ea5e9;
-          color:#000;
-          font-weight:700;
-          cursor:pointer">
-        Execute
-      </button>
+        <% if(ep.params){ %>
+          <% Object.entries(ep.params).forEach(([key,val])=>{ %>
+            <div class="field">
+              <input
+                name="<%= key %>"
+                placeholder="<%= val.example || '' %>"
+                title="<%= val.desc || '' %>"
+                required
+              />
+              <% if(val.desc){ %>
+                <small><%= val.desc %></small>
+              <% } %>
+            </div>
+          <% }) %>
+        <% } %>
 
-      <!-- RESULT -->
-      <pre id="result-<%= i %>" style="
-        margin-top:12px;
-        background:rgba(0,0,0,.35);
-        padding:12px;
-        border-radius:12px;
-        max-height:300px;
-        overflow:auto;
-        font-size:12px">
+        <button class="exec">Execute</button>
+      </form>
+
+      <pre id="result-<%= i %>" class="result">
+Response will appear here…
       </pre>
 
     </div>
-
   </div>
 
 <% }) %>
+
 </section>
 
-<!-- SCRIPT -->
 <script>
 function toggleTry(i){
-  const box = document.getElementById('try-'+i);
-  const icon = document.getElementById('icon-'+i);
-  const open = box.style.display === 'block';
-
-  box.style.display = open ? 'none' : 'block';
-  icon.textContent = open ? 'expand_more' : 'expand_less';
+  const box = document.getElementById('try-'+i)
+  const icon = document.getElementById('icon-'+i)
+  const open = box.style.display === 'block'
+  box.style.display = open ? 'none' : 'block'
+  icon.textContent = open ? '⌄' : '⌃'
 }
 
-async function executeAPI(i,path,method){
-  const input = document.getElementById('input-'+i);
-  const out = document.getElementById('result-'+i);
-
-  out.textContent = 'Loading...';
+async function executeAPI(e,i,path,method){
+  e.preventDefault()
+  const form = e.target
+  const out = document.getElementById('result-'+i)
+  out.textContent = 'Loading...'
 
   try{
-    let res;
+    const data = Object.fromEntries(new FormData(form))
+    let res
 
-    if(method === 'POST'){
-      res = await fetch(path,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ q: input.value })
-      });
+    if(method === 'GET'){
+      const url = new URL(path,location.origin)
+      Object.entries(data).forEach(([k,v])=>{
+        url.searchParams.append(k,v)
+      })
+      res = await fetch(url)
     }else{
-      res = await fetch(path + '?q=' + encodeURIComponent(input.value));
+      res = await fetch(path,{
+        method,
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      })
     }
 
-    const data = await res.json();
-    out.textContent = JSON.stringify(data,null,2);
+    const json = await res.json()
+    out.textContent = JSON.stringify(json,null,2)
+
   }catch(err){
-    out.textContent = 'Error: ' + err.message;
+    out.textContent = 'Error: ' + err.message
   }
 }
 </script>
