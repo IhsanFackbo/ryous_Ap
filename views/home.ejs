@@ -1,21 +1,68 @@
-<%- include('partials/header',{title:'API Platform'}) %>
+<%- include('partials/header', { title: 'API Platform', name, showGetStarted: true }) %>
+
+<style>
+  section.card {
+    background: #121212;
+    border-radius: 16px;
+    padding: 40px 32px;
+    margin-top: 28px;
+    box-shadow: 0 3px 25px rgba(0,0,0,0.7);
+    color: #eee;
+  }
+  small.subtitle {
+    font-weight: 600;
+    opacity: 0.35;
+  }
+  h1 {
+    font-weight: 900;
+    font-size: 2.8rem;
+    margin-top: 8px;
+    letter-spacing: -0.04em;
+  }
+  p.muted {
+    font-size: 16px;
+    margin-top: 14px;
+    line-height: 1.5;
+    color: #aaa;
+    max-width: 480px;
+  }
+  a.btn {
+    margin-top: 24px;
+    display: inline-block;
+    font-weight: 800;
+    font-size: 19px;
+    background: #4fd1ff;
+    color: #001017;
+    padding: 16px 44px;
+    border-radius: 22px;
+    user-select: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-decoration: none;
+  }
+  a.btn:hover {
+    background: #3bb5e3;
+  }
+</style>
 
 <section class="card">
+  <small class="subtitle">#BuildWithNeko by NekoLabs.</small>
   <h1>No Keys, No Limits,<br>Just Build.</h1>
   <p class="muted">
-    Access high-performance REST APIs designed for developers.
+    Access a comprehensive collection of RESTful APIs designed for developers.<br>
+    Integrate powerful features into your applications without the hassle of authentication.
   </p>
-  <br>
-  <a href="/api" class="btn">Explore API</a>
+  <a href="/api" class="btn">Get Started →</a>
 </section>
 
-<br>
-
-<section class="card">
-  <h3>⚡ Lightning Fast</h3>
-  <p class="muted">
-    Optimized endpoints with minimal latency.
-  </p>
+<section class="card" style="margin-top: 40px; display:flex; align-items:center; gap:20px;">
+  <span style="font-size: 32px; background:#222; border-radius: 10px; padding: 16px; display: flex; align-items: center; justify-content: center;">⚡</span>
+  <div>
+    <h3 style="margin: 0; font-weight: 700; color: #eee;">Lightning Fast</h3>
+    <p style="color:#aaa; max-width: 540px; margin-top: 6px;">
+      High-performance endpoints with minimal latency for seamless integration.
+    </p>
+  </div>
 </section>
 
-<%- include('partials/footer') %>
+<%- include('partials/footer', { name }) %>
