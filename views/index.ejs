@@ -1,93 +1,75 @@
 <%- include('partials/header', {
   title: 'API Explorer',
-  description
+  description: 'Browse available API categories'
 }) %>
 
-<h1 class="text-2xl font-bold mb-4">API Categories</h1>
-
-<!-- SEARCH -->
-<div class="mb-4">
-  <input
-    id="searchInput"
-    type="text"
-    placeholder="Search API..."
-    class="w-full px-4 py-3 text-sm rounded-xl border
-           bg-white dark:bg-slate-800
-           placeholder-slate-400 dark:placeholder-slate-500
-           focus:outline-none focus:ring-2 focus:ring-cyan-500">
+<!-- TERMINAL -->
+<div class="terminal">
+  <div class="terminal-header">
+    <div class="dot red"></div>
+    <div class="dot yellow"></div>
+    <div class="dot green"></div>
+  </div>
+  <div class="term-text">
+    nekolabs@api:~$ search endpoints...
+  </div>
 </div>
 
-<p id="noResult"
-   class="hidden mb-4 text-sm text-slate-500">
-  API belum ada atau belum ditambahkan oleh owner.
+<!-- SEARCH -->
+<input
+  id="searchInput"
+  placeholder="Search API..."
+  style="
+    width:100%;
+    padding:14px 16px;
+    border-radius:16px;
+    background:#0f1418;
+    border:1px solid var(--border);
+    color:var(--text);
+    outline:none;
+    margin-bottom:20px;
+  "
+>
+
+<p id="noResult" style="display:none;color:var(--muted)">
+  API belum ada atau belum ditambahkan.
 </p>
 
 <!-- CATEGORY LIST -->
-<section id="categoryList" class="space-y-3">
-  <% if (endpoints && endpoints.length > 0) { %>
-    <% endpoints.forEach(category => { 
-      const slug = category.name.toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-');
+<div id="categoryList">
+  <% endpoints.forEach(cat => { %>
+    <a href="/category/<%= cat.slug %>"
+       class="card category-card"
+       data-search="<%= cat.name.toLowerCase() %>">
 
-      const searchData = (
-        category.name + ' ' +
-        category.items.map(i =>
-          i.path + ' ' + (i.alias || '')
-        ).join(' ')
-      ).toLowerCase();
-    %>
-
-    <a
-      href="/category/<%= slug %>"
-      class="block p-4 border rounded-xl category-card
-             hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-      data-search="<%= searchData %>">
-
-      <div class="flex justify-between items-center">
-        <div>
-          <h3 class="font-semibold text-sm">
-            <%= category.name %>
-          </h3>
-          <p class="text-xs text-slate-500">
-            <%= category.items.length %> endpoints
-          </p>
-        </div>
-
-        <span class="material-icons-outlined text-slate-400">
-          chevron_right
-        </span>
+      <div style="font-weight:700">
+        <%= cat.name %>
+      </div>
+      <div style="font-size:13px;color:var(--muted)">
+        <%= cat.items.length %> endpoints
       </div>
 
     </a>
-    <% }) %>
-  <% } else { %>
-    <p class="text-sm text-slate-500">
-      Belum ada API yang tersedia.
-    </p>
-  <% } %>
-</section>
+  <% }) %>
+</div>
 
-<!-- REALTIME SEARCH SCRIPT -->
 <script>
-  const input = document.getElementById('searchInput');
-  const cards = document.querySelectorAll('.category-card');
-  const noResult = document.getElementById('noResult');
+const input = document.getElementById('searchInput');
+const cards = document.querySelectorAll('.category-card');
+const noResult = document.getElementById('noResult');
 
-  input.addEventListener('input', () => {
-    const q = input.value.toLowerCase().trim();
-    let found = false;
+input.addEventListener('input',()=>{
+  const q=input.value.toLowerCase().trim();
+  let found=false;
 
-    cards.forEach(card => {
-      const data = card.dataset.search;
-      const match = data.includes(q);
-
-      card.style.display = match ? 'block' : 'none';
-      if (match) found = true;
-    });
-
-    noResult.classList.toggle('hidden', found || q === '');
+  cards.forEach(card=>{
+    const match = card.dataset.search.includes(q);
+    card.style.display = match ? 'block' : 'none';
+    if(match) found=true;
   });
+
+  noResult.style.display = found || !q ? 'none' : 'block';
+});
 </script>
 
-<%- include('partials/footer', { name }) %>
+<%- include('partials/footer',{name}) %>
