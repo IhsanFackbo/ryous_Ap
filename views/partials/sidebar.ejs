@@ -1,8 +1,9 @@
-<div id="overlay" onclick="toggleMenu()"></div>
+<div id="drawer" aria-label="Sidebar menu">
+  <a href="/" style="font-weight:bold;">Home documentation</a>
 
-<aside id="drawer">
-  <h3><%= name %></h3>
-  <a href="/">Home</a>
-  <a href="/api">Documentation</a>
-  <a href="https://github.com/IxanAmd" target="_blank">GitHub</a>
-</aside>
+  <% if (endpoints && endpoints.length) { %>
+    <% endpoints.forEach(cat => { %>
+      <a href="/category/<%= cat.name.toLowerCase().replace(/\s+/g,'-') %>"><%= cat.name %></a>
+    <% }) %>
+  <% } %>
+</div>
