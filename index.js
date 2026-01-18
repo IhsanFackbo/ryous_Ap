@@ -1,4 +1,5 @@
 (async () => {
+    // imports dan setup seperti biasa
     const express = require('express');
     const path = require('path');
     const chalk = require('chalk');
@@ -12,7 +13,6 @@
 
     const app = express();
     app.set('json spaces', 2);
-
     app.set('view engine', 'ejs');
     app.set('views', path.join(__dirname, './views'));
     app.use(express.static(path.join(__dirname, './public')));
@@ -20,8 +20,17 @@
     app.use(express.urlencoded({ limit: '1gb', extended: true }));
     app.use(minim);
 
+    // sediakan res.reply jika belum ada
+    if (!express.response.reply) {
+      express.response.reply = function(data, options) {
+        if (options && options.code) this.status(options.code);
+        return this.json(data);
+      };
+    }
+
     consola.start('Starting server initialization...');
 
+    // Middleware log tiap request
     app.use((req, res, next) => {
         req.startTime = Date.now();
         res.on('finish', () => {
@@ -32,7 +41,7 @@
         next();
     });
 
-    // helpers
+    // Helpers
     String.prototype.capitalize = function () {
         return this.charAt(0).toUpperCase() + this.slice(1);
     };
@@ -47,15 +56,15 @@
     consola.start('Loading API endpoints...');
     global.allEndpoints = loader.loadEndpointsFromDirectory('api', app);
 
-    consola.ready(
-        `Loaded ${allEndpoints.reduce((t, c) => t + c.items.length, 0)} endpoints`
-    );
+    consola.ready(`Loaded ${allEndpoints.reduce((t, c) => t + c.items.length, 0)} endpoints`);
 
-    // =========================
-    // ROUTING
-    // =========================
+    // Kirim endpoints ke semua views via locals supaya sidebar bisa akses endpoints tanpa perlu passing manual
+    app.use((req, res, next) => {
+      res.locals.endpoints = global.allEndpoints;
+      next();
+    });
 
-    // HOME / INTRODUCING
+    // HOME PAGE
     app.get('/', async (req, res) => {
         const { type } = req.query;
 
@@ -74,7 +83,7 @@
         });
     });
 
-    // API EXPLORER
+    // API EXPLORER (list kategori)
     app.get('/api', async (req, res) => {
         const { type } = req.query;
 
@@ -98,7 +107,7 @@
         });
     });
 
-    // CATEGORY
+    // CATEGORY DETAIL
     app.get('/category/:categoryName', async (req, res) => {
         const { type } = req.query;
         const { categoryName } = req.params;
@@ -139,15 +148,41 @@
         });
     });
 
-    // =========================
-    // ERROR HANDLING
-    // =========================
+    // === IMPORTANT ===
+    // Daftarkan semua endpoints ke express agar bisa diakses,
+    // mis. menggunakan data dari loader, ini contoh logika sederhana:
+    allEndpoints.forEach(category => {
+      category.items.forEach(ep => {
+        const methods = ep.method.toUpperCase().split('/').map(m => m.trim());
+        methods.forEach(method => {
+          const routeHandler = (req, res) => {
+            // Cari handler dari loader (asumsi loader sudah menambahkan route di app)
+            // Kalaupun loader tidak menambahkan route, bisa tambahkan route disini sesuai path dan handler
+            // Jika loader tdk tambahkan router, tambahkan penanganan error disini:
+            res.status(404).json({
+              error: `Endpoint ${ep.path} dengan method ${method} belum diimplementasikan di server.`
+            });
+          };
+          switch (method) {
+            case 'GET':
+              app.get(ep.path, routeHandler);
+              break;
+            case 'POST':
+              app.post(ep.path, routeHandler);
+              break;
+            // Tambah method lain jika perlu
+          }
+        });
+      });
+    });
 
+    // 404 fallback
     app.use((req, res) => {
         consola.info(`404: ${chalk.red(req.method)} ${req.path}`);
         res.reply('Not Found.', { code: 404 });
     });
 
+    // Error middleware
     app.use((err, req, res, next) => {
         if (err.code === 'LIMIT_FILE_SIZE')
             return res.reply('File size exceeds limit.', { code: 413 });
@@ -155,10 +190,6 @@
         consola.error(`500: ${chalk.red(err.message)}`);
         res.reply(err.message, { code: 500 });
     });
-
-    // =========================
-    // START SERVER
-    // =========================
 
     app.listen(PORT, () => {
         consola.success(`Server started at http://localhost:${PORT}`);
