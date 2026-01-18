@@ -1,66 +1,17 @@
-<%- include('partials/header',{title:'API Explorer'}) %>
+<%- include('partials/header',{title:'API Explorer',description,name}) %>
 
-<!-- SIDEBAR KIRI -->
-<div class="sidebar">
-  <% endpoints.forEach((cat,i)=>{ %>
-    <div class="cat <%= i===0?'active':'' %>"
-         onclick="selectCategory(<%= i %>)">
-      <%= cat.name %>
-    </div>
-  <% }) %>
+<h2>Available Categories</h2>
+
+<% endpoints.forEach(cat=>{ 
+  const slug=cat.name.toLowerCase().replace(/\s+/g,'-');
+%>
+
+<div class="card">
+  <h3><%= cat.name %></h3>
+  <p><%= cat.items.length %> endpoints</p>
+  <a href="/category/<%= slug %>">View Endpoints →</a>
 </div>
 
-<!-- CONTENT -->
-<div class="content" id="content">
-  <div class="card">
-    <h2 id="title"><%= endpoints[0].name %></h2>
-    <p class="muted">Select an endpoint on the right</p>
-  </div>
-</div>
+<% }) %>
 
-<!-- SIDEBAR KANAN -->
-<div class="sidebar" id="endpointBar">
-  <% endpoints[0].items.forEach((ep,j)=>{ %>
-    <div class="endpoint"
-         onclick="selectEndpoint('<%= ep.method %>','<%= ep.path %>')">
-      <b><%= ep.method %></b> <%= ep.path %>
-    </div>
-  <% }) %>
-</div>
-
-<script>
-const data = <%- JSON.stringify(endpoints) %>;
-
-function selectCategory(i){
-  document.querySelectorAll('.cat').forEach(c=>c.classList.remove('active'));
-  document.querySelectorAll('.cat')[i].classList.add('active');
-
-  const bar = document.getElementById('endpointBar');
-  bar.innerHTML = '';
-
-  data[i].items.forEach(ep=>{
-    const d=document.createElement('div');
-    d.className='endpoint';
-    d.innerHTML=`<b>${ep.method}</b> ${ep.path}`;
-    d.onclick=()=>selectEndpoint(ep.method,ep.path);
-    bar.appendChild(d);
-  });
-
-  document.getElementById('content').innerHTML=
-    `<div class="card">
-      <h2>${data[i].name}</h2>
-      <p class="muted">Select an endpoint</p>
-    </div>`;
-}
-
-function selectEndpoint(method,path){
-  document.getElementById('content').innerHTML=
-    `<div class="card">
-      <h3>${method} ${path}</h3>
-      <p class="muted">Endpoint ready</p>
-      <button style="margin-top:1rem">Execute</button>
-    </div>`;
-}
-</script>
-
-<%- include('partials/footer') %>
+<%- include('partials/footer',{name}) %>
