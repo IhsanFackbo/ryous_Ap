@@ -1,46 +1,140 @@
+<%- include('partials/header',{
+  title: categoryName,
+  description: categoryDesc,
+  name,
+  showGetStarted: false
+}) %>
+
+<!-- CATEGORY HEADER -->
+<section style="margin-bottom:24px">
+  <h1 style="margin:0 0 6px 0"><%= categoryName %></h1>
+  <p style="opacity:.75;max-width:600px">
+    <%= categoryDesc %>
+  </p>
+</section>
+
+<!-- ENDPOINT LIST -->
+<section>
 <% category.items.forEach((ep,i)=>{ %>
-<div class="card">
-  <div class="endpoint">
-    <b><%= ep.method %></b>
-    <span><%= ep.path %></span>
-    <button onclick="toggleTry(<%= i %>)">Try</button>
+
+  <div class="card">
+
+    <!-- ENDPOINT BAR -->
+    <div class="endpoint" onclick="toggleTry(<%= i %>)" style="cursor:pointer">
+      <span style="
+        background:rgba(0,200,255,.15);
+        color:#7fe7ff;
+        padding:4px 10px;
+        border-radius:999px;
+        font-size:12px;
+        font-weight:600">
+        <%= ep.method %>
+      </span>
+
+      <span style="flex:1;margin-left:10px">
+        <%= ep.path %>
+      </span>
+
+      <span class="material-icons-outlined" id="icon-<%= i %>">
+        expand_more
+      </span>
+    </div>
+
+    <!-- TRY PANEL -->
+    <div id="try-<%= i %>" style="
+      display:none;
+      margin-top:12px;
+      animation:fade .25s ease">
+
+      <% if(ep.alias){ %>
+        <p style="opacity:.7;margin-bottom:8px">
+          <%= ep.alias %>
+        </p>
+      <% } %>
+
+      <!-- INPUT -->
+      <input
+        id="input-<%= i %>"
+        placeholder="Masukkan query (contoh: halo)"
+        style="
+          width:100%;
+          padding:12px;
+          border-radius:12px;
+          border:1px solid rgba(255,255,255,.08);
+          background:rgba(0,0,0,.25);
+          color:#fff;
+          outline:none"
+      />
+
+      <!-- ACTION -->
+      <button
+        onclick="executeAPI(<%= i %>,'<%= ep.path %>','<%= ep.method %>')"
+        style="
+          margin-top:10px;
+          padding:10px 16px;
+          border-radius:12px;
+          border:none;
+          background:#0ea5e9;
+          color:#000;
+          font-weight:700;
+          cursor:pointer">
+        Execute
+      </button>
+
+      <!-- RESULT -->
+      <pre id="result-<%= i %>" style="
+        margin-top:12px;
+        background:rgba(0,0,0,.35);
+        padding:12px;
+        border-radius:12px;
+        max-height:300px;
+        overflow:auto;
+        font-size:12px">
+      </pre>
+
+    </div>
+
   </div>
 
-  <div id="try-<%= i %>" style="display:none;margin-top:10px">
-    <input
-      id="input-<%= i %>"
-      placeholder="Query (contoh: halo)"
-      style="width:100%;padding:10px;border-radius:10px;border:none"
-    />
+<% }) %>
+</section>
 
-    <button onclick="executeAPI(<%= i %>,'<%= ep.path %>')"
-      style="margin-top:8px;padding:8px 14px;border-radius:10px">
-      Execute
-    </button>
-
-    <pre id="result-<%= i %>"
-      style="margin-top:10px;white-space:pre-wrap"></pre>
-  </div>
-</div>
+<!-- SCRIPT -->
 <script>
 function toggleTry(i){
-  const el=document.getElementById('try-'+i);
-  el.style.display=el.style.display==='none'?'block':'none';
+  const box = document.getElementById('try-'+i);
+  const icon = document.getElementById('icon-'+i);
+  const open = box.style.display === 'block';
+
+  box.style.display = open ? 'none' : 'block';
+  icon.textContent = open ? 'expand_more' : 'expand_less';
 }
 
-async function executeAPI(i,path){
-  const q=document.getElementById('input-'+i).value;
-  const out=document.getElementById('result-'+i);
+async function executeAPI(i,path,method){
+  const input = document.getElementById('input-'+i);
+  const out = document.getElementById('result-'+i);
 
-  out.textContent='Loading...';
+  out.textContent = 'Loading...';
 
   try{
-    const res=await fetch(path+'?q='+encodeURIComponent(q));
-    const json=await res.json();
-    out.textContent=JSON.stringify(json,null,2);
-  }catch(e){
-    out.textContent='Error: '+e.message;
+    let res;
+
+    if(method === 'POST'){
+      res = await fetch(path,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ q: input.value })
+      });
+    }else{
+      res = await fetch(path + '?q=' + encodeURIComponent(input.value));
+    }
+
+    const data = await res.json();
+    out.textContent = JSON.stringify(data,null,2);
+  }catch(err){
+    out.textContent = 'Error: ' + err.message;
   }
 }
 </script>
-<% }) %>
+
+<%- include('partials/footer',{name}) %>
