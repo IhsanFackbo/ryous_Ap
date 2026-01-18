@@ -1,17 +1,56 @@
-<%- include('partials/header',{title:'API Explorer',description,name}) %>
+<%- include('partials/header', { title: 'API Explorer', name }) %>
+
+<style>
+  h2 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #eee;
+  }
+  .card {
+    background: #121212;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    color: #ccc;
+    user-select:none;
+  }
+  .card h3 {
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .card p {
+    font-size: 14px;
+    opacity: 0.7;
+  }
+  .card a {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 8px 22px;
+    border-radius: 10px;
+    background: #4fd1ff;
+    color: #001017;
+    font-weight: 600;
+    user-select:none;
+    text-decoration: none;
+    transition: background 0.3s ease;
+  }
+  .card a:hover {
+    background: #3bb5e3;
+  }
+</style>
 
 <h2>Available Categories</h2>
 
-<% endpoints.forEach(cat=>{ 
-  const slug=cat.name.toLowerCase().replace(/\s+/g,'-');
+<% endpoints.forEach(cat => {
+  const slug = cat.name.toLowerCase().replace(/\s+/g,'-');
 %>
-
-<div class="card">
-  <h3><%= cat.name %></h3>
-  <p><%= cat.items.length %> endpoints</p>
-  <a href="/category/<%= slug %>">View Endpoints →</a>
-</div>
-
+  <div class="card">
+    <h3><%= cat.name %></h3>
+    <p><%= cat.items.length %> endpoints</p>
+    <a href="/category/<%= slug %>">View Endpoints →</a>
+  </div>
 <% }) %>
 
-<%- include('partials/footer',{name}) %>
+<%- include('partials/footer', { name }) %>
