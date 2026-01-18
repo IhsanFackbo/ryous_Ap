@@ -1,87 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="<%= description || name %>">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="<%= description || name %>" />
   <title><%= title || name %></title>
 
   <link rel="icon" href="/favicon.ico">
 
-  <!-- Anti flicker dark mode -->
-  <script>
-    (function () {
-      const t = localStorage.getItem('theme');
-      const p = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (t === 'dark' || (!t && p)) document.documentElement.classList.add('dark');
-    })();
-  </script>
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter','system-ui','sans-serif'],
-            mono: ['Ubuntu Mono','monospace']
-          }
-        }
-      }
-    }
-  </script>
-
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Ubuntu+Mono&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Ubuntu+Mono&display=swap" rel="stylesheet">
 
-  <style>
-    .gbtn{
-      display:inline-flex;align-items:center;gap:.4rem;
-      padding:.5rem .9rem;border-radius:.7rem;
-      background:#0ea5e9;color:#fff;
-      font-size:.75rem;font-weight:700;
-    }
-  </style>
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="/css/app.css">
 </head>
 
-<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+<body>
 
 <!-- TOP BAR -->
-<header class="flex items-center justify-between px-4 py-3 border-b dark:border-slate-800">
-  <button onclick="toggleMenu()" class="p-2 border rounded-lg">
+<header class="topbar">
+  <button class="icon-btn" onclick="toggleMenu()" aria-label="Menu">
     <span class="material-icons-outlined">menu</span>
   </button>
 
-  <span class="font-bold text-lg"><%= name %></span>
+  <div style="font-weight:800;letter-spacing:.4px">
+    <%= name %>
+  </div>
 
-  <button id="themeToggle" class="p-2 border rounded-lg">
-    <span class="material-icons-outlined" id="themeIcon">dark_mode</span>
-  </button>
+  <div style="width:24px"></div>
 </header>
 
+<!-- SIDEBAR -->
 <%- include('sidebar', { name }) %>
 
-<script>
-  function toggleMenu(){
-    document.getElementById('drawer').classList.toggle('-translate-x-full');
-    document.getElementById('overlay').classList.toggle('hidden');
-  }
-
-  const icon = document.getElementById('themeIcon');
-  function syncTheme(){
-    icon.textContent = document.documentElement.classList.contains('dark')
-      ? 'light_mode' : 'dark_mode';
-  }
-  syncTheme();
-  document.getElementById('themeToggle').onclick = () => {
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem(
-      'theme',
-      document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-    );
-    syncTheme();
-  };
-</script>
-
-<main class="max-w-5xl mx-auto px-4 py-6">
+<!-- MAIN CONTENT -->
+<main>
