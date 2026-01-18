@@ -1,115 +1,34 @@
-<%- include('partials/header', {
-  title: 'API Documentation',
-  description: 'Dokumentasi resmi penggunaan API'
-}) %>
+<main>
 
-<!-- INTRO -->
-<section id="intro" class="max-w-3xl mb-16 scroll-mt-20">
-  <h1 class="text-3xl font-bold mb-4">📘 API Documentation</h1>
+<div class="terminal">
+  <div class="terminal-header">
+    <div class="dot red"></div>
+    <div class="dot yellow"></div>
+    <div class="dot green"></div>
+  </div>
+  <div class="term-text">
+    nekolabs@api:~$ cd /docs
+  </div>
+</div>
 
-  <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-    <b><%= name %></b> adalah REST API yang menyediakan berbagai endpoint
-    untuk automation, scraping, AI tools, dan media processing.
-    API ini dirancang agar mudah digunakan dan fleksibel.
+<h1 style="font-size:34px;font-weight:800;margin-bottom:10px">
+  No Keys, No Limits,<br>Just Build.
+</h1>
+
+<p style="color:var(--muted);margin-bottom:24px">
+Access a comprehensive collection of RESTful APIs designed for developers.
+</p>
+
+<a class="btn">Get Started →</a>
+
+<div class="card" style="margin-top:32px">
+  <strong>⚡ Lightning Fast</strong>
+  <p style="color:var(--muted)">
+    High-performance endpoints with minimal latency.
   </p>
+</div>
 
-  <div class="mt-6 flex gap-3">
-    <a href="#usage" class="gbtn text-xs">Cara Pakai</a>
-    <a href="#platform" class="gbtn text-xs">Platform</a>
-    <a href="#contact" class="gbtn text-xs">Hubungi Admin</a>
-  </div>
-</section>
-
-<!-- BASE URL -->
-<section class="max-w-3xl mb-16 scroll-mt-20">
-  <h2 class="text-xl font-bold mb-3">🔗 Base URL</h2>
-
-  <pre class="text-xs bg-slate-900 text-white p-4 rounded-xl">
-https://ryous-ap.vercel.app/
-  </pre>
-</section>
-
-<!-- USAGE -->
-<section id="usage" class="max-w-3xl mb-20 scroll-mt-20">
-  <h2 class="text-xl font-bold mb-4">⚙️ Cara Penggunaan</h2>
-
-  <p class="text-sm text-slate-600 dark:text-slate-300 mb-6">
-    API menggunakan metode HTTP standar. Response dikembalikan dalam format JSON.
-  </p>
-
-  <!-- STEP 1 -->
-  <div class="mb-10">
-    <h3 class="font-semibold mb-2">1️⃣ Request via Browser / Fetch</h3>
-
-    <img
-      src="https://files.catbox.moe/8a7gnm.jpg"
-      alt="API via browser"
-      class="rounded-xl border mb-3 w-full">
-
-    <pre class="text-xs bg-slate-900 text-white p-3 rounded-xl">
-GET /api/example?text=halo
-    </pre>
-  </div>
-
-  <!-- STEP 2 -->
-  <div class="mb-10">
-    <h3 class="font-semibold mb-2">2️⃣ Request via Postman</h3>
-
-    <img
-      src="https://files.catbox.moe/5t2e6x.jpg"
-      alt="API via Postman"
-      class="rounded-xl border mb-3 w-full">
-
-    <pre class="text-xs bg-slate-900 text-white p-3 rounded-xl">
-{
-  "status": true,
-  "result": "halo"
-}
-    </pre>
-  </div>
-
-  <!-- STEP 3 -->
-  <div class="mb-10">
-    <h3 class="font-semibold mb-2">3️⃣ Request via cURL</h3>
-
-    <img
-      src="https://files.catbox.moe/ckudyq.jpg"
-      alt="API via curl"
-      class="rounded-xl border mb-3 w-full">
-
-    <pre class="text-xs bg-slate-900 text-white p-3 rounded-xl">
-curl -X GET "https://ryous-ap.vercel.app/api/example?text
-=halo"
-    </pre>
-  </div>
-</section>
-
-<!-- PLATFORM -->
-<section id="platform" class="max-w-3xl mb-20 scroll-mt-20">
-  <h2 class="text-xl font-bold mb-4">🧩 Bisa Digunakan Di</h2>
-
-  <ul class="list-disc list-inside text-sm text-slate-600 dark:text-slate-300 space-y-2">
-    <li>Website (Fetch / Axios)</li>
-    <li>Mobile App (Android, iOS, Flutter)</li>
-    <li>Bot (WhatsApp, Telegram, Discord)</li>
-    <li>Backend (Node.js, PHP, Python)</li>
-    <li>Automation & CLI</li>
-  </ul>
-</section>
-
-<!-- CONTACT -->
-<section id="contact" class="max-w-3xl scroll-mt-20">
-  <h2 class="text-xl font-bold mb-4">📞 Hubungi Admin</h2>
-
-  <div class="p-4 border rounded-xl">
-    <p class="text-sm mb-3">
-      Jika ada error atau request fitur baru, hubungi admin:
-    </p>
-
-    <ul class="text-sm space-y-2">
-      <li>📱 WhatsApp: <a href="#" class="text-cyan-500">+625135214510</a></li>
-      <li>💬 Telegram: <a href="#" class="text-cyan-500">@isan</a></li>
-      <li>💻 GitHub: <a href="#" class="text-cyan-500">github.com/IxanAmd</a></li>
+</main>      <li>💻 GitHub: <a href="#" class="text-cyan-500">github.com/IxanAmd</a></li>
     </ul>
   </div>
 </section>
