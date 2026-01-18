@@ -1,178 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="<%= description || name %>" />
-  <title><%= title || name %></title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= title || name %></title>
 
-  <link rel="icon" href="/favicon.ico">
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Ubuntu+Mono&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-
-  <style>
+<style>
+/* ======================
+   COLOR SYSTEM (RICH BLACK)
+====================== */
 :root{
-  --rich:#001011;
-  --surface:#0a0f12;
-  --card:#11161a;
-  --border:#1f2a30;
-  --grid:rgba(255,255,255,.03);
-  --azure:#6ccff6;
-  --text:#e7f7fc;
-  --muted:#9fb7c1;
+  --bg:#001011;           /* Rich Black */
+  --card:#0b1c1f;
+  --border:rgba(255,255,255,.08);
+  --text:#e6f6fb;
+  --muted:#9bb7c3;
+  --accent:#6ccff6;       /* Pale Azure */
 }
 
 /* RESET */
 *{box-sizing:border-box}
-html,body{
+html{scroll-behavior:smooth}
+body{
   margin:0;
-  background:var(--rich);
-  color:var(--text);
   font-family:Inter,system-ui,sans-serif;
+  background:radial-gradient(circle at top,#062128,var(--bg));
+  color:var(--text);
+  animation:fadeIn .6s ease;
 }
 
-/* GRID BACKGROUND */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size:40px 40px;
-  pointer-events:none;
-  z-index:-1;
-}
-
-/* PAGE ENTER */
-main{
-  animation:fadeUp .6s ease;
-}
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(8px)}
+/* ANIMATION */
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(6px)}
   to{opacity:1;transform:none}
 }
 
-/* HEADER */
+/* LAYOUT */
+main{
+  max-width:980px;
+  margin:auto;
+  padding:1.2rem;
+}
+
+/* HEADER BAR */
 .topbar{
+  position:sticky;
+  top:0;
+  z-index:50;
+  backdrop-filter:blur(10px);
+  background:rgba(0,16,17,.75);
+  border-bottom:1px solid var(--border);
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:14px 16px;
+  padding:.8rem 1rem;
 }
 
-.icon-btn{
-  background:none;
-  border:none;
-  color:var(--text);
-  font-size:22px;
-}
-
-/* TERMINAL CARD */
-.terminal{
-  background:linear-gradient(180deg,#1b1f23,#0f1316);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:24px;
-}
-.terminal-header{
-  display:flex;
-  gap:8px;
-  margin-bottom:10px;
-}
-.dot{width:10px;height:10px;border-radius:50%}
-.red{background:#ff5f56}
-.yellow{background:#ffbd2e}
-.green{background:#27c93f}
-.term-text{
-  font-family:"Ubuntu Mono",monospace;
-  font-size:13px;
-  color:#9ef0b2;
-}
-
-/* CARD */
-.card{
-  background:linear-gradient(180deg,#171b1f,#0f1316);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:18px;
-  margin-bottom:20px;
+.brand{
+  font-weight:800;
+  letter-spacing:.4px;
 }
 
 /* BUTTON */
 .btn{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:14px 18px;
-  border-radius:16px;
-  border:1px solid var(--border);
-  background:#12181c;
-  color:var(--text);
-  font-weight:600;
-}
-
-/* SIDEBAR */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  backdrop-filter:blur(8px);
-  opacity:0;
-  pointer-events:none;
-  transition:.4s;
-}
-.overlay.show{opacity:1;pointer-events:auto}
-
-.drawer{
-  position:fixed;
-  top:0;left:0;
-  width:280px;height:100%;
-  background:#12161a;
-  border-right:1px solid var(--border);
-  transform:translateX(-100%);
-  transition:.45s cubic-bezier(.4,0,.2,1);
-}
-.drawer.show{transform:none}
-
-.drawer-header{
-  padding:16px;
-  font-size:18px;
+  padding:.6rem 1rem;
+  border-radius:12px;
+  background:linear-gradient(135deg,#6ccff6,#4ab0e8);
+  color:#001011;
   font-weight:700;
+  border:none;
+  cursor:pointer;
+  transition:.25s;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(108,207,246,.35)}
+
+/* CARD */
+.card{
+  background:linear-gradient(180deg,#0e2429,#09181b);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:1rem;
+  box-shadow:0 30px 80px rgba(0,0,0,.45);
+  animation:fadeIn .6s ease;
 }
 
-.drawer a{
-  display:block;
-  padding:14px 18px;
-  margin:6px 12px;
-  border-radius:14px;
-  color:var(--muted);
-}
-.drawer a.active,
-.drawer a:hover{
-  background:#1a1f24;
-  color:var(--text);
-}
+/* TEXT */
+h1,h2,h3{margin:.2em 0}
+.muted{color:var(--muted);font-size:.85rem}
+
+/* LIST */
+.list{display:flex;flex-direction:column;gap:.8rem}
+
+/* LINK */
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* FOOTER SPACE */
+.footer-space{height:4rem}
 </style>
 </head>
 
 <body>
 
 <header class="topbar">
-  <button class="icon-btn" onclick="toggleMenu()">
-    <span class="material-icons-outlined">menu</span>
-  </button>
-
-  <div style="font-weight:800">
-    <%= name %>
-  </div>
-
-  <div style="width:24px"></div>
+  <div class="brand"><%= name %></div>
+  <a href="/api" class="btn">Get Started</a>
 </header>
-
-<%- include('sidebar', { name }) %>
 
 <main>
