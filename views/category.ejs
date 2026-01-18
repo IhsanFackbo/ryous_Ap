@@ -1,82 +1,373 @@
-<%- include('partials/header',{
+<%- include('partials/header', {
   title: categoryName,
   name,
-  showGetStarted:false
+  showGetStarted: false
 }) %>
 
+<style>
+  /* Container card and style */
+  .card {
+    background:#121212;
+    border-radius:16px;
+    padding:24px;
+    margin-top:24px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.5);
+    color:#fff;
+  }
+
+  h1 {
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  p.desc {
+    font-size: 15px;
+    color: #aaa;
+    margin-bottom: 24px;
+    max-width: 600px;
+    line-height: 1.4;
+  }
+
+  /* Tab container */
+  .tab-menu {
+    display: flex;
+    gap: 20px;
+    border-bottom: 1.5px solid #222;
+    margin-bottom: 16px;
+    user-select: none;
+  }
+  .tab-menu div {
+    padding: 8px 0;
+    font-weight: 600;
+    color: #bbb;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+  .tab-menu div.active {
+    color: #4fd1ff;
+  }
+  .tab-menu div.active::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 2.5px;
+    background: #4fd1ff;
+    border-radius: 2px;
+  }
+
+  .method-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-right: 8px;
+    opacity: 0.8;
+    user-select: none;
+  }
+  .badge-get { background: #2a9fd6; color: #d0f0ff;}
+  .badge-post { background: #d68a2b; color: #fff2c1;}
+
+  /* Parameter label, input */
+  label.param-label {
+    display: block;
+    margin-top: 16px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #ccc;
+  }
+  label.param-label span.required {
+    color: #f45d48;
+    margin-left: 3px;
+  }
+  small.param-desc {
+    display: block;
+    margin-top: 4px;
+    font-weight: 400;
+    font-size: 12px;
+    color: #888;
+    font-style: italic;
+  }
+  input.param-input {
+    width: 100%;
+    margin-top: 6px;
+    background: #222;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 14px;
+    font-size: 15px;
+    color: #eee;
+    outline: none;
+    transition: background 0.25s ease;
+  }
+  input.param-input::placeholder {
+    color: #666;
+  }
+  input.param-input:focus {
+    background: #333;
+  }
+
+  /* Buttons container */
+  .btn-container {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+  }
+
+  button.exec-btn {
+    flex-grow: 1;
+    background: #4fd1ff;
+    color: #001017;
+    font-weight: 700;
+    font-size: 16px;
+    border: none;
+    border-radius: 14px;
+    padding: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s ease;
+  }
+  button.exec-btn:hover {
+    background: #3bb5e3;
+  }
+
+  button.copy-btn {
+    flex-basis: 48px;
+    background: #222;
+    border-radius: 14px;
+    border: 1.5px solid #444;
+    color: #4fd1ff;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.3s ease;
+  }
+  button.copy-btn:hover {
+    border-color: #4fd1ff;
+  }
+
+  /* Response area */
+  .response-area {
+    margin-top: 28px;
+    background: #111;
+    border-radius: 12px;
+    border: 1.5px solid #222;
+    padding: 18px;
+    font-family: monospace, monospace;
+    font-size: 13px;
+    color: #62d2ff;
+    min-height: 130px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+</style>
+
 <h1><%= categoryName %></h1>
-<p style="color:var(--muted);max-width:600px"><%= categoryDesc %></p>
+<p class="desc"><%= categoryDesc %></p>
 
-<% category.items.forEach((ep,i)=>{ %>
+<% category.items.forEach((ep,i) => { 
+  // Tentukan method mana yang bisa (bisa GET, POST, atau keduanya)
+  let methodList = [];
+  if(ep.method.toUpperCase().includes("GET")) methodList.push("GET");
+  if(ep.method.toUpperCase().includes("POST")) methodList.push("POST");
+  if(methodList.length === 0) methodList.push(ep.method.toUpperCase());
+%>
 
-<div class="card" style="margin-top:16px">
+<div class="card">
 
-  <div class="endpoint-head" onclick="toggle(<%= i %>)">
-    <span class="method <%= ep.method.toLowerCase() %>">
-      <%= ep.method %>
-    </span>
-    <span style="flex:1"><%= ep.path %></span>
-    <span id="ic-<%= i %>">⌄</span>
+  <h2 style="margin-bottom: 12px;"><%= ep.alias || ep.path %></h2>
+
+  <div style="margin-bottom:16px;">
+    <% if(categoryDesc) { %>
+      <% if(ep.method && ep.params) { %>
+        <!-- Show category tags -->
+        <% if(categoryName === "Blue Archive Logo") { %>
+          <span class="method-badge badge-get">Image Response</span>
+          <span class="method-badge badge-post">Logo Generator</span>
+        <% } %>
+      <% } %>
+    <% } %>
   </div>
 
-  <div class="endpoint-body" id="ep-<%= i %>">
+  <div style="display:flex;gap:10px;margin-bottom:14px;align-items:center;">
+    <% methodList.forEach(m => { %>
+      <button type="button" class="tab-method-btn <%=(m==="GET"?"active":"")%>" data-idx="<%=i%>" data-method="<%=m%>"><%=m%></button>
+    <% }) %>
 
-    <% if(ep.alias){ %>
-      <p style="color:var(--muted)"><%= ep.alias %></p>
+    <code style="background:#222;padding:4px 8px;border-radius:8px;user-select:none;flex-grow:1;text-align:right;">
+      <%= ep.path %>
+    </code>
+  </div>
+
+  <form id="form-<%=i%>" data-index="<%=i%>">
+    <div class="params-container" data-index="<%=i%>" data-method="GET">
+      <% if(ep.params && methodList.includes("GET")) { 
+          Object.entries(ep.params).forEach(([key,value])=>{
+      %>
+        <label class="param-label" for="param-<%= i %>-<%=key%>">
+          <%= key %><span class="required">*</span>
+        </label>
+        <small class="param-desc"><%= value.desc %></small>
+        <input 
+          class="param-input" 
+          id="param-<%= i %>-<%=key%>" 
+          name="<%= key %>" 
+          placeholder="<%= value.example || '' %>"
+          required
+          autocomplete="off" />
+      <% }) %>
+    </div>
     <% } %>
 
-    <form onsubmit="exec(event,<%= i %>,'<%= ep.path %>','<%= ep.method %>')">
+    <div class="params-container" data-index="<%=i%>" data-method="POST" style="display:none;">
+      <% if(ep.params && methodList.includes("POST")) { 
+          Object.entries(ep.params).forEach(([key,value])=>{
+      %>
+        <label class="param-label" for="param-post-<%= i %>-<%=key%>">
+          <%= key %><span class="required">*</span>
+        </label>
+        <small class="param-desc"><%= value.desc %></small>
+        <input 
+          class="param-input" 
+          id="param-post-<%= i %>-<%=key%>" 
+          name="<%= key %>" 
+          placeholder="<%= value.example || '' %>"
+          required
+          autocomplete="off" />
+      <% }) %>
+    </div>
+    <% } %>
 
-      <% if(ep.params){ %>
-        <% Object.entries(ep.params).forEach(([k,v])=>{ %>
-          <label style="font-size:13px;color:var(--muted)">
-            <%= k %>
-          </label>
-          <input
-            name="<%= k %>"
-            placeholder="<%= v.example || '' %>"
-            title="<%= v.desc || '' %>"
-          />
-        <% }) %>
-      <% } %>
+    <div class="btn-container">
+      <button type="submit" class="exec-btn" data-index="<%=i%>">▶ Execute</button>
+      <button type="button" title="Copy cURL command" class="copy-btn" data-index="<%=i%>">&#128279;</button>
+    </div>
+  </form>
 
-      <button class="exec">Execute</button>
-    </form>
-
-    <pre id="res-<%= i %>">Response will appear here…</pre>
+  <div>
+    <h3 style="margin-top:28px; margin-bottom: 12px; font-weight: 600; color: #4fd1ff;">
+      &#x2714; RESPONSE
+    </h3>
+    <pre class="response-area" id="response-<%=i%>">Send a request to see the response here...</pre>
   </div>
-</div>
 
+  <div style="margin-top: 24px;">
+    <h3 style="margin-bottom:8px; font-weight:600;">&#128187; CURL COMMAND</h3>
+    <pre class="response-area" id="curl-<%=i%>"></pre>
+    <small style="color:#666;">cURL command to test the endpoint.</small>
+  </div>
+
+</div>
 <% }) %>
 
 <script>
-function toggle(i){
-  const el=document.getElementById('ep-'+i)
-  el.classList.toggle('open')
-  document.getElementById('ic-'+i).textContent=
-    el.classList.contains('open')?'⌃':'⌄'
-}
+  // Tab method switching logic
+  document.querySelectorAll(".tab-method-btn").forEach(btn => {
+    btn.onclick = e => {
+      const idx = btn.getAttribute("data-idx");
+      const method = btn.getAttribute("data-method");
 
-async function exec(e,i,path,method){
-  e.preventDefault()
-  const data=Object.fromEntries(new FormData(e.target))
-  const out=document.getElementById('res-'+i)
+      // Toggle active button in the group
+      const groupBtns = document.querySelectorAll(`.tab-method-btn[data-idx="${idx}"]`);
+      groupBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
 
-  let res
-  if(method==='GET'){
-    const url=new URL(path,location.origin)
-    Object.entries(data).forEach(([k,v])=>url.searchParams.append(k,v))
-    res=await fetch(url)
-  }else{
-    res=await fetch(path,{
-      method,
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(data)
-    })
+      // Show/Hide parameters container
+      document.querySelectorAll(`.params-container[data-index="${idx}"]`).forEach(div => {
+        div.style.display = (div.getAttribute("data-method") === method) ? "block" : "none";
+      });
+
+      // Clear previous response / curl command
+      document.getElementById(`response-${idx}`).textContent = "Send a request to see the response here...";
+      document.getElementById(`curl-${idx}`).textContent = "";
+    };
+  });
+
+  // Default show first method parameter of each form
+  document.querySelectorAll(".tab-method-btn.active").forEach(btn => btn.click());
+
+  // Execute form send function
+  async function sendRequest(i, method, params) {
+    let url = document.querySelectorAll(".card")[i].querySelector("code").textContent.trim();
+    let options = { method, headers: {} };
+    
+    if(method === "GET") {
+      // Add URL params for GET
+      const searchParams = new URLSearchParams(params).toString();
+      url += "?" + searchParams;
+    } else if(method === "POST") {
+      options.headers["Content-Type"] = "application/json";
+      options.body = JSON.stringify(params);
+    }
+
+    const resElement = document.getElementById(`response-${i}`);
+    const curlElement = document.getElementById(`curl-${i}`);
+
+    try {
+      resElement.textContent = "Loading...";
+      const res = await fetch(url, options);
+      let text = await res.text();
+
+      // Show cURL command
+      const curlCmdParts = [`curl -X ${method} "${url.includes('?') && method==='POST' ? url.split('?')[0] : url}"`];
+      if(method === "POST") {
+        curlCmdParts.push(`-H "Content-Type: application/json"`);
+        curlCmdParts.push(`-d '${options.body}'`);
+      }
+      curlElement.textContent = curlCmdParts.join(" \\\n  ");
+
+      // Try parse json, else raw text
+      try {
+        text = JSON.stringify(JSON.parse(text), null, 2);
+        resElement.textContent = text;
+      } catch {
+        resElement.textContent = text;
+      }
+    } catch(err) {
+      resElement.textContent = "Request error: " + err.message;
+      curlElement.textContent = "";
+    }
   }
 
-  out.textContent=JSON.stringify(await res.json(),null,2)
-}
+  // Handle form submit event
+  document.querySelectorAll("form").forEach(form => {
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const index = e.target.getAttribute("data-index");
+      const activeMethodBtn = document.querySelector(`.tab-method-btn.active[data-idx="${index}"]`);
+      if (!activeMethodBtn) return;
+
+      const method = activeMethodBtn.getAttribute("data-method");
+      const paramsObj = {};
+      e.target.querySelectorAll(".params-container").forEach(div => {
+        if(div.style.display === "block") {
+          div.querySelectorAll("input").forEach(input => {
+            paramsObj[input.name] = input.value.trim();
+          });
+        }
+      });
+
+      sendRequest(index, method, paramsObj);
+    });
+  });
+
+  // Copy cURL functionality
+  document.querySelectorAll("button.copy-btn").forEach(btn => {
+    btn.onclick = () => {
+      const index = btn.getAttribute("data-index");
+      const curlText = document.getElementById(`curl-${index}`).textContent;
+      if(!curlText) return alert("No cURL command to copy!");
+      navigator.clipboard.writeText(curlText)
+        .then(() => alert("cURL command copied to clipboard"))
+        .catch(() => alert("Failed to copy"));
+    };
+  });
 </script>
 
-<%- include('partials/footer',{name}) %>
+<%- include('partials/footer', { name }) %>
