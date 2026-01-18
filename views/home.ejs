@@ -1,40 +1,21 @@
-<main>
+<%- include('partials/header',{title:'API Platform'}) %>
 
-<div class="terminal">
-  <div class="terminal-header">
-    <div class="dot red"></div>
-    <div class="dot yellow"></div>
-    <div class="dot green"></div>
-  </div>
-  <div class="term-text">
-    isrelzapp@api:~$ cd /docs
-  </div>
-</div>
-
-<h1 style="font-size:34px;font-weight:800;margin-bottom:10px">
-  No Keys, No Limits,<br>Just Build.
-</h1>
-
-<p style="color:var(--muted);margin-bottom:24px">
-Access a comprehensive collection of RESTful APIs designed for developers.
-</p>
-
-<a class="btn">Get Started →</a>
-
-<div class="card" style="margin-top:32px">
-  <strong>⚡ Lightning Fast</strong>
-  <p style="color:var(--muted)">
-    High-performance endpoints with minimal latency.
+<section class="card">
+  <h1>No Keys, No Limits,<br>Just Build.</h1>
+  <p class="muted">
+    Access high-performance REST APIs designed for developers.
   </p>
-</div>
-
-</main>      <li>💻 GitHub: <a href="#" class="text-cyan-500">github.com/IxanAmd</a></li>
-    </ul>
-  </div>
+  <br>
+  <a href="/api" class="btn">Explore API</a>
 </section>
 
-<style>
-  html { scroll-behavior: smooth; }
-</style>
+<br>
 
-<%- include('partials/footer', { name }) %>
+<section class="card">
+  <h3>⚡ Lightning Fast</h3>
+  <p class="muted">
+    Optimized endpoints with minimal latency.
+  </p>
+</section>
+
+<%- include('partials/footer') %>
