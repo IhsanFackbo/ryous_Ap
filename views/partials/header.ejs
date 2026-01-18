@@ -1,111 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title><%= title || name %></title>
 
-<style>
-:root{
-  --bg:#001011;
-  --card:#0b1c1f;
-  --border:rgba(255,255,255,.08);
-  --text:#e6f6fb;
-  --muted:#9bb7c3;
-  --accent:#6ccff6;
-}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
-/* RESET */
+<style>
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Inter,system-ui,sans-serif;
-  background:radial-gradient(circle at top,#062128,var(--bg));
-  color:var(--text);
+  font-family:Inter,system-ui;
+  background:linear-gradient(180deg,#03171b,#020c10);
+  color:#e6f7ff;
 }
 
-/* TOPBAR */
+/* HEADER */
 .topbar{
-  height:60px;
+  height:56px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 1rem;
-  background:rgba(0,16,17,.8);
-  border-bottom:1px solid var(--border);
+  padding:0 16px;
+  background:#031f24;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.topbar button{
+  background:none;
+  border:none;
+  color:#9ee7ff;
 }
 
-/* LAYOUT */
-.app{
-  display:grid;
-  grid-template-columns:240px 1fr 320px;
-  height:calc(100vh - 60px);
+/* DRAWER */
+#overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.45);
+  display:none;
+  z-index:9;
 }
-
-/* SIDEBAR */
-.sidebar{
-  padding:.8rem;
-  overflow:auto;
-  background:linear-gradient(180deg,#0e2429,#071417);
-  border-right:1px solid var(--border);
+#drawer{
+  position:fixed;
+  top:0;left:0;
+  width:260px;height:100%;
+  background:#041c22;
+  transform:translateX(-100%);
+  transition:.35s ease;
+  z-index:10;
+  padding:16px;
 }
-
-/* KATEGORI ITEM */
-.cat{
-  padding:.6rem .8rem;
+#drawer a{
+  display:block;
+  padding:12px;
   border-radius:12px;
-  cursor:pointer;
-  color:var(--muted);
-  transition:.25s;
+  color:#bfefff;
+  text-decoration:none;
 }
-.cat:hover,
-.cat.active{
-  background:rgba(108,207,246,.12);
-  color:var(--accent);
-}
-
-/* ENDPOINT ITEM */
-.endpoint{
-  padding:.6rem;
-  border-radius:10px;
-  font-size:.85rem;
-  cursor:pointer;
-  transition:.25s;
-}
-.endpoint:hover,
-.endpoint.active{
-  background:rgba(255,255,255,.08);
+#drawer a:hover{
+  background:rgba(255,255,255,.06);
 }
 
 /* CONTENT */
-.content{
-  padding:1rem;
-  overflow:auto;
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
   animation:fade .4s ease;
 }
 
-/* CARD */
 .card{
-  background:linear-gradient(180deg,#0e2429,#09181b);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:1rem;
-  margin-bottom:1rem;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:14px;
+  transition:.25s ease;
+}
+.card:hover{transform:translateY(-2px)}
+
+.endpoint{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px;
+  border-radius:12px;
+  background:rgba(0,0,0,.25);
+  margin-top:10px;
+  font-family:monospace;
 }
 
-/* ANIMATION */
 @keyframes fade{
-  from{opacity:0;transform:translateY(6px)}
-  to{opacity:1}
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:none}
 }
 </style>
 </head>
 
 <body>
 
-<div class="topbar">
+<header class="topbar">
+  <button onclick="toggleMenu()">
+    <span class="material-icons-outlined">menu</span>
+  </button>
   <b><%= name %></b>
-  <a href="/api" style="color:var(--accent)">Get Started</a>
-</div>
+  <a href="/api" style="color:#8fe3ff">Get Started</a>
+</header>
 
-<div class="app">
+<%- include('sidebar',{name}) %>
+
+<script>
+function toggleMenu(){
+  const d=document.getElementById('drawer');
+  const o=document.getElementById('overlay');
+  const open=d.style.transform==='translateX(0px)';
+  d.style.transform=open?'translateX(-100%)':'translateX(0)';
+  o.style.display=open?'none':'block';
+}
+</script>
+
+<main>
