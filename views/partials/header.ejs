@@ -1,146 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title><%= title || name %></title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
 <style>
+:root{
+  --bg:#020c10;
+  --panel:#06171c;
+  --card:#0b1f26;
+  --border:rgba(255,255,255,.06);
+  --text:#e6f7ff;
+  --muted:#9cc9d9;
+  --accent:#4fd1ff;
+}
 *{box-sizing:border-box}
 body{
   margin:0;
   font-family:Inter,system-ui;
-  background:linear-gradient(180deg,#03171b,#020c10);
-  color:#e6f7ff;
+  background:linear-gradient(180deg,#041b22,var(--bg));
+  color:var(--text);
 }
-
-/* ===== HEADER ===== */
 .topbar{
   height:56px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:0 16px;
-  background:#031f24;
-  border-bottom:1px solid rgba(255,255,255,.06);
+  background:#041c22;
+  border-bottom:1px solid var(--border);
 }
 .topbar button{
-  background:none;
-  border:none;
-  color:#9ee7ff;
-  cursor:pointer;
+  background:none;border:none;color:var(--accent)
 }
-.topbar a{
-  color:#8fe3ff;
-  text-decoration:none;
-  font-weight:600;
-}
-
-/* ===== DRAWER ===== */
 #overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  display:none;
-  z-index:9;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;z-index:9
 }
 #overlay.show{display:block}
-
 #drawer{
-  position:fixed;
-  top:0;left:0;
+  position:fixed;top:0;left:0;
   width:260px;height:100%;
   background:#041c22;
   transform:translateX(-100%);
   transition:.35s ease;
-  z-index:10;
-  padding:16px;
+  z-index:10;padding:16px
 }
 #drawer.show{transform:translateX(0)}
-
 #drawer a{
   display:block;
   padding:12px;
   border-radius:12px;
-  color:#bfefff;
-  text-decoration:none;
+  color:var(--text);
+  text-decoration:none
 }
-#drawer a:hover{
-  background:rgba(255,255,255,.06);
-}
-
-/* ===== CONTENT ===== */
+#drawer a:hover{background:rgba(255,255,255,.06)}
 main{
   max-width:1100px;
   margin:auto;
-  padding:20px;
-  animation:fade .4s ease;
+  padding:20px
 }
-
-/* ===== CARD & ENDPOINT ===== */
 .card{
-  background:rgba(0,0,0,.35);
-  border-radius:18px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
   padding:16px;
-  margin-bottom:16px;
-  transition:.25s ease;
 }
-.card:hover{transform:translateY(-2px)}
-
-.endpoint-bar{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  cursor:pointer;
-}
-
 .method{
-  background:rgba(0,200,255,.15);
-  color:#7fe7ff;
   padding:4px 10px;
   border-radius:999px;
   font-size:12px;
   font-weight:700;
 }
-
-.try-box{display:none;margin-top:12px}
-
-.field input{
+.method.get{background:rgba(79,209,255,.15);color:var(--accent)}
+.method.post{background:rgba(255,180,100,.15);color:#ffb464}
+.endpoint-head{
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer
+}
+.endpoint-body{
+  display:none;
+  margin-top:12px
+}
+.endpoint-body.open{display:block}
+input{
   width:100%;
   padding:12px;
   border-radius:12px;
-  background:rgba(0,0,0,.3);
-  color:#fff;
-  border:1px solid rgba(255,255,255,.1);
-  outline:none;
+  background:#04141a;
+  border:1px solid var(--border);
+  color:var(--text)
 }
-
-.exec{
+button.exec{
   margin-top:12px;
   padding:10px 18px;
   border-radius:14px;
-  background:#0ea5e9;
-  font-weight:700;
   border:none;
-  cursor:pointer;
+  background:var(--accent);
+  color:#001017;
+  font-weight:700;
+  cursor:pointer
 }
-
-.result{
-  margin-top:12px;
-  background:rgba(0,0,0,.4);
-  padding:12px;
+pre{
+  background:#031017;
   border-radius:14px;
-  max-height:300px;
-  overflow:auto;
+  padding:12px;
+  margin-top:12px;
   font-size:12px;
-}
-
-@keyframes fade{
-  from{opacity:0;transform:translateY(10px)}
-  to{opacity:1;transform:none}
+  max-height:300px;
+  overflow:auto
 }
 </style>
 </head>
@@ -151,11 +124,9 @@ main{
   <button onclick="toggleMenu()">
     <span class="material-icons-outlined">menu</span>
   </button>
-
   <b><%= name %></b>
-
-  <% if (showGetStarted !== false) { %>
-    <a href="/api">Get Started</a>
+  <% if(showGetStarted!==false){ %>
+    <a href="/api" style="color:var(--accent)">Get Started</a>
   <% } %>
 </header>
 
@@ -163,8 +134,8 @@ main{
 
 <script>
 function toggleMenu(){
-  document.getElementById('drawer').classList.toggle('show')
-  document.getElementById('overlay').classList.toggle('show')
+  drawer.classList.toggle('show')
+  overlay.classList.toggle('show')
 }
 </script>
 
