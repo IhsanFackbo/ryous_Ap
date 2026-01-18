@@ -1,20 +1,46 @@
-<%- include('partials/header',{title:categoryName,description:categoryDesc,name}) %>
-
-<a href="/api">← Back</a>
-
-<h2><%= categoryName %></h2>
-<p><%= categoryDesc %></p>
-
-<% category.items.forEach(ep=>{ %>
+<% category.items.forEach((ep,i)=>{ %>
 <div class="card">
   <div class="endpoint">
     <b><%= ep.method %></b>
     <span><%= ep.path %></span>
+    <button onclick="toggleTry(<%= i %>)">Try</button>
   </div>
-  <% if(ep.alias){ %>
-    <small><%= ep.alias %></small>
-  <% } %>
+
+  <div id="try-<%= i %>" style="display:none;margin-top:10px">
+    <input
+      id="input-<%= i %>"
+      placeholder="Query (contoh: halo)"
+      style="width:100%;padding:10px;border-radius:10px;border:none"
+    />
+
+    <button onclick="executeAPI(<%= i %>,'<%= ep.path %>')"
+      style="margin-top:8px;padding:8px 14px;border-radius:10px">
+      Execute
+    </button>
+
+    <pre id="result-<%= i %>"
+      style="margin-top:10px;white-space:pre-wrap"></pre>
+  </div>
 </div>
 <% }) %>
+<script>
+function toggleTry(i){
+  const el=document.getElementById('try-'+i);
+  el.style.display=el.style.display==='none'?'block':'none';
+}
 
-<%- include('partials/footer',{name}) %>
+async function executeAPI(i,path){
+  const q=document.getElementById('input-'+i).value;
+  const out=document.getElementById('result-'+i);
+
+  out.textContent='Loading...';
+
+  try{
+    const res=await fetch(path+'?q='+encodeURIComponent(q));
+    const json=await res.json();
+    out.textContent=JSON.stringify(json,null,2);
+  }catch(e){
+    out.textContent='Error: '+e.message;
+  }
+}
+</script>
